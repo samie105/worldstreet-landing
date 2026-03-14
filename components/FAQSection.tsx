@@ -6,32 +6,32 @@ import { ArrowUpRight, Plus, Minus } from "lucide-react";
 
 const faqs = [
   {
-    question: "What is Cryptix?",
-    answer: "Cryptix is a comprehensive cryptocurrency platform designed for seamless trading, investing, and managing digital assets with top-tier security.",
+    question: "What is Worldstreet?",
+    answer: "Worldstreet is a trusted digital trading ecosystem designed for seamlessly trading Forex, Crypto, CFDs, and managing your digital assets with top-tier security.",
   },
   {
     question: "How fast are transactions?",
-    answer: "Transactions on Cryptix are processed almost instantly, leveraging high-performance matching engines and optimized liquidity pools.",
+    answer: "Transactions on Worldstreet are processed almost instantly, leveraging high-performance matching engines and optimized liquidity pools.",
   },
   {
-    question: "Is Cryptix secure?",
-    answer: "Yes, Cryptix employs bank-grade encryption, cold storage for the majority of funds, and rigorous security audits to ensure your assets are safe.",
+    question: "Is Worldstreet secure?",
+    answer: "Yes, Worldstreet employs bank-grade encryption, secure storage for funds, and rigorous security audits to ensure your assets are safe at all times.",
   },
   {
     question: "Do I need to verify my identity?",
     answer: "To comply with regulatory standards and ensure a safe trading environment, we require identity verification (KYC) for all users before standard trading.",
   },
   {
-    question: "Which cryptocurrencies are supported?",
-    answer: "We support a wide range of cryptocurrencies including Bitcoin, Ethereum, Solana, and dozens of other popular altcoins and stablecoins.",
+    question: "Which markets are supported?",
+    answer: "We support a wide range of markets including traditional Forex pairs, major cryptocurrencies like Bitcoin and Ethereum, and various CFDs.",
   },
   {
-    question: "Can I access Cryptix on mobile?",
-    answer: "Absolutely. Our fully responsive web app and dedicated mobile applications for iOS and Android allow you to be able trade on the go.",
+    question: "Can I access Worldstreet on mobile?",
+    answer: "Absolutely. Our fully responsive web app and upcoming dedicated mobile applications for iOS and Android allow you to trade on the go.",
   },
   {
     question: "What are the fees for transactions?",
-    answer: "We offer highly competitive fee structures starting from 0.1% per trade, with further discounts for high-volume traders.",
+    answer: "We offer highly competitive fee structures for both Forex and Crypto trading, with further discounts for high-volume traders.",
   },
   {
     question: "How can I contact support?",
@@ -62,7 +62,7 @@ export default function FAQSection() {
                 Your Questions, Answered
               </h2>
               <p className="text-white/60 text-base md:text-lg lg:text-xl max-w-md">
-                Find everything you need to know about Cryptix, from security to supported assets.
+                Find everything you need to know about Worldstreet, from security to supported assets.
               </p>
             </div>
 
@@ -72,7 +72,7 @@ export default function FAQSection() {
               <div className="flex-1 p-6 md:p-10 flex items-center justify-start md:justify-end">
                 <a
                   href="#"
-                  className="inline-flex items-center gap-3 text-[#bdff00] text-[15px] font-medium hover:text-[#d4ff66] transition-colors group"
+                  className="inline-flex items-center gap-3 text-[#FFCC2D] text-[15px] font-medium hover:text-[#FFE066] transition-colors group"
                 >
                   Create account now
                   <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
@@ -120,7 +120,7 @@ export default function FAQSection() {
                     <span className="text-base md:text-lg font-medium pr-8 text-white">
                       {faq.question}
                     </span>
-                    <div className="text-[#bdff00] shrink-0">
+                    <div className="text-[#FFCC2D] shrink-0">
                       {isOpen ? (
                         <Minus className="w-5 h-5 mx-0.5" />
                       ) : (

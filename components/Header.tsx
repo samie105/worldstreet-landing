@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 
 const navLinks = [
-  { label: "Home", href: "#" },
-  { label: "About Us", href: "#about" },
-  { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Home", href: "/" },
+  { label: "About Us", href: "/about" },
+  { label: "Features", href: "/#features" },
+  { label: "Leaderboard", href: "/leaderboard" },
+  { label: "Pricing", href: "/#pricing" },
 ];
 
 export default function Header() {
@@ -34,14 +35,9 @@ export default function Header() {
       <div className="bg-transparent">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-[#bdff00] flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="1" width="6" height="6" rx="1" fill="#050505" />
-                <rect x="9" y="1" width="6" height="6" rx="1" fill="#050505" />
-                <rect x="1" y="9" width="6" height="6" rx="1" fill="#050505" />
-                <rect x="9" y="9" width="6" height="6" rx="1" fill="#bdff00" stroke="#050505" strokeWidth="0.5" />
-              </svg>
+          <a href="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img src="/worldstreet-logo/WorldStreet4.png" alt="Worldstreet Logo" className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-bold tracking-tight text-white">Worldstreet.</span>
           </a>

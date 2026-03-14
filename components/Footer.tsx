@@ -4,14 +4,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12 md:gap-24">
         {/* Left column */}
         <div className="flex flex-col max-w-sm shrink-0">
-          <a href="#" className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-[#bdff00] flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="1" width="6" height="6" rx="1" fill="#050505" />
-                <rect x="9" y="1" width="6" height="6" rx="1" fill="#050505" />
-                <rect x="1" y="9" width="6" height="6" rx="1" fill="#050505" />
-                <rect x="9" y="9" width="6" height="6" rx="1" fill="#bdff00" stroke="#050505" strokeWidth="0.5" />
-              </svg>
+          <a href="/" className="flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img src="/worldstreet-logo/WorldStreet4.png" alt="Worldstreet Logo" className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-bold tracking-tight text-white">Worldstreet.</span>
           </a>

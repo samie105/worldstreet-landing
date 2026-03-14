@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-brand: #bdff00; /* Electric green */
-  --color-brand-glow: rgba(189, 255, 0, 0.4);
+  --color-brand: #FFCC2D; /* Accent yellow */
+  --color-brand-glow: rgba(255, 204, 45, 0.4);
   --color-surface: #0a0a0a;
   --color-surface-elevated: #111111;
   --color-surface-glass: rgba(255, 255, 255, 0.03);

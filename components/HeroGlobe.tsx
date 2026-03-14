@@ -96,12 +96,12 @@ export default function HeroGlobe() {
       </div>
 
       {/* Accent green dot */}
-      <div className="absolute top-[18%] left-[6%] w-1.5 h-1.5 rounded-full bg-[#bdff00] animate-pulse z-[2]" />
+      <div className="absolute top-[18%] left-[6%] w-1.5 h-1.5 rounded-full bg-[#FFCC2D] animate-pulse z-[2]" />
 
       {/* Hero Content - Foreground, overlapping lower part of globe */}
       <div className="relative z-10 text-center max-w-3xl mx-auto px-6 mt-[30vh]">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] backdrop-blur-md mb-6">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#bdff00] box-glow animate-pulse" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[#FFCC2D] box-glow animate-pulse" />
           <span className="text-xs font-medium text-gray-300">Introducing Worldstreet Ecosystem</span>
         </div>
 
@@ -115,7 +115,7 @@ export default function HeroGlobe() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <button className="px-6 py-3 rounded-full bg-[#bdff00] text-black font-semibold text-sm hover:bg-white hover:box-glow transition-all duration-300 flex items-center gap-2">
+          <button className="px-6 py-3 rounded-full bg-[#FFCC2D] text-black font-semibold text-sm hover:bg-white hover:box-glow transition-all duration-300 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             Get Started Now
           </button>

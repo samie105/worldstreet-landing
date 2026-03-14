@@ -39,7 +39,7 @@ export default function TickerMarquee() {
             <div key={index} className="flex items-center gap-3 font-mono text-sm tracking-wider">
               <span className="font-semibold text-gray-300">{ticker.pair}</span>
               <span className="text-white">{ticker.price}</span>
-              <span className={isPositive ? "text-[#bdff00] text-glow" : "text-red-500"}>
+              <span className={isPositive ? "text-[#FFCC2D] text-glow" : "text-red-500"}>
                 {ticker.change}
               </span>
             </div>
