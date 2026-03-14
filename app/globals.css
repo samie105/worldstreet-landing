@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-brand: #bdff00; /* Electric green */
+  --color-brand-glow: rgba(189, 255, 0, 0.4);
+  --color-surface: #0a0a0a;
+  --color-surface-elevated: #111111;
+  --color-surface-glass: rgba(255, 255, 255, 0.03);
+  --color-surface-border: rgba(255, 255, 255, 0.08);
+
+  --font-sans: var(--font-sans), sans-serif;
+  --font-body: var(--font-body), sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  html,
+  body {
+    background-color: #050505;
+    color: #e2e8f0;
+    scroll-behavior: auto; /* Handled by Lenis */
+    font-family: var(--font-body);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 50;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.02;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: var(--color-surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-surface-border);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px var(--color-brand-glow);
+  }
+
+  .box-glow {
+    box-shadow: 0 0 30px var(--color-brand-glow);
+  }
+
+  .animate-marquee-left {
+    animation: marquee-left 25s linear infinite;
+  }
+  .animate-marquee-right {
+    animation: marquee-right 25s linear infinite;
+  }
+}
+
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-33.33333% - 0.33333rem)); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translateX(calc(-33.33333% - 0.33333rem)); }
+  100% { transform: translateX(0); }
+}
