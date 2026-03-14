@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Plus, Minus } from "lucide-react";
 
-const faqs = [
+const defaultFaqs = [
   {
     question: "What is Worldstreet?",
     answer: "Worldstreet is a trusted digital trading ecosystem designed for seamlessly trading Forex, Crypto, CFDs, and managing your digital assets with top-tier security.",
@@ -39,7 +39,22 @@ const faqs = [
   },
 ];
 
-export default function FAQSection() {
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface FAQSectionProps {
+  items?: FAQItem[];
+  title?: string;
+  subtitle?: string;
+}
+
+export default function FAQSection({
+  items = defaultFaqs,
+  title = "Your Questions, Answered",
+  subtitle = "Find everything you need to know about Worldstreet, from security to supported assets."
+}: FAQSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleAccordion = (index: number) => {
@@ -59,10 +74,10 @@ export default function FAQSection() {
             {/* Header Left (Title area) */}
             <div className="p-6 md:p-10 lg:p-12 border-b md:border-b-0 md:border-r border-white/[0.08] flex flex-col justify-center min-h-[220px] md:min-h-[260px]">
               <h2 className="text-3xl md:text-5xl lg:text-5xl font-medium mb-6 tracking-tight text-white">
-                Your Questions, Answered
+                {title}
               </h2>
               <p className="text-white/60 text-base md:text-lg lg:text-xl max-w-md">
-                Find everything you need to know about Worldstreet, from security to supported assets.
+                {subtitle}
               </p>
             </div>
 
@@ -90,12 +105,12 @@ export default function FAQSection() {
           
           {/* FAQs Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2">
-            {faqs.map((faq, index) => {
+            {items.map((faq, index) => {
               const isOpen = openIndex === index;
               
               // Determine border classes based on position
-              const isLastDesktopRow = index >= faqs.length - 2;
-              const isLastMobileItem = index === faqs.length - 1;
+              const isLastDesktopRow = index >= items.length - 2;
+              const isLastMobileItem = index === items.length - 1;
 
               let borderClasses = "border-b";
               if (isLastDesktopRow) {

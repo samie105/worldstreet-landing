@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import FAQSection from "../../components/FAQSection";
 
 /* ─── Static Data ─── */
 const COUNTRY_FLAGS: Record<string, string> = {
@@ -76,12 +77,12 @@ const STEPS = [
 ];
 
 const FAQS = [
-  { q: "How is ranking calculated?", a: "Rankings are based on total trading volume (in lots) across all eligible markets during the competition week. The trader with the highest cumulative volume holds the top position." },
-  { q: "Who can participate?", a: "Any registered WorldStreet user with a verified account can participate. Simply trade on any supported market with a minimum trade size of 0.1 lots." },
-  { q: "What counts as volume?", a: "All completed trades of 0.1 lots or more on supported assets count towards your weekly volume. Both buy and sell trades are included." },
-  { q: "What happens in a tie?", a: "In the event of a tie in trading volume, the trader who reached the volume milestone first (by timestamp) will be ranked higher." },
-  { q: "Why does time matter?", a: "Time serves as the tiebreaker. If two traders have the same volume, the one who achieved it earlier in the week gets the higher rank." },
-  { q: "Fair play notice", a: "WorldStreet reserves the right to disqualify any trader suspected of manipulative or fraudulent trading activity. All trades are monitored to ensure a fair competition." },
+  { question: "How is ranking calculated?", answer: "Rankings are based on total trading volume (in lots) across all eligible markets during the competition week. The trader with the highest cumulative volume holds the top position." },
+  { question: "Who can participate?", answer: "Any registered WorldStreet user with a verified account can participate. Simply trade on any supported market with a minimum trade size of 0.1 lots." },
+  { question: "What counts as volume?", answer: "All completed trades of 0.1 lots or more on supported assets count towards your weekly volume. Both buy and sell trades are included." },
+  { question: "What happens in a tie?", answer: "In the event of a tie in trading volume, the trader who reached the volume milestone first (by timestamp) will be ranked higher." },
+  { question: "Why does time matter?", answer: "Time serves as the tiebreaker. If two traders have the same volume, the one who achieved it earlier in the week gets the higher rank." },
+  { question: "Fair play notice", answer: "WorldStreet reserves the right to disqualify any trader suspected of manipulative or fraudulent trading activity. All trades are monitored to ensure a fair competition." },
 ];
 
 /* ─── Helpers ─── */
@@ -142,7 +143,6 @@ export default function LeaderboardPage() {
   const [assetFilter, setAssetFilter] = useState("All Assets");
   const [countryFilter, setCountryFilter] = useState("All Countries");
   const [sortBy, setSortBy] = useState("volume");
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // Filter & sort
   const filtered = TRADERS.filter((t) => {
@@ -485,45 +485,11 @@ export default function LeaderboardPage() {
       </section>
 
       {/* ══════════ FAQ ══════════ */}
-      <section className="py-16 md:py-24 px-6 border-t border-[rgba(255,255,255,0.05)] bg-[#0a0a0a]">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-3 mb-10">
-            <svg className="w-6 h-6 text-[#FFCC2D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <h4 className="text-xl font-bold text-white">Frequently Asked Questions</h4>
-          </div>
-          <div className="space-y-2">
-            {FAQS.map((faq, i) => (
-              <div key={i} className="glass rounded-xl overflow-hidden">
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between px-5 py-4 text-left"
-                >
-                  <span className="text-sm font-medium text-white">{faq.q}</span>
-                  <svg
-                    className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ml-4 ${openFaq === i ? "rotate-180" : ""}`}
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                  >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
-                <AnimatePresence>
-                  {openFaq === i && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <p className="px-5 pb-4 text-sm text-gray-400 leading-relaxed">{faq.a}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FAQSection 
+        items={FAQS} 
+        title="Competition FAQs" 
+        subtitle="Common questions about the leaderboard and weekly competition rules." 
+      />
 
       {/* ══════════ CONTACT + DOCUMENTS ══════════ */}
       <section className="py-16 md:py-24 px-6 border-t border-[rgba(255,255,255,0.05)]">

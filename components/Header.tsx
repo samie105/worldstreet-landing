@@ -2,11 +2,31 @@
 
 import { useState, useEffect, useRef } from "react";
 
-const navLinks = [
+type NavLink = {
+  label: string;
+  href?: string;
+  dropdown?: { label: string; href: string }[];
+};
+
+const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
   { label: "Features", href: "/#features" },
-  { label: "Leaderboard", href: "/leaderboard" },
+  { 
+    label: "Leaderboard", 
+    href: "/leaderboard",
+    dropdown: [
+      { label: "Privacy Policy", href: "/legal-docs/Privacy Policy.pdf" },
+      { label: "Account Opening Agreement", href: "/legal-docs/WorldStreet Account Opening Agreement.pdf" },
+      { label: "Risk Disclaimer", href: "/legal-docs/WorldStreet Risk Disclaimer.pdf" },
+      { label: "Trading & Execution Risks", href: "/legal-docs/WorldStreet Trading & Execution Risks.pdf" },
+      { label: "Anti-Money Laundering (AML)", href: "/legal-docs/WS Anti Money Laundering(2).pdf" },
+      { label: "Cookie Policy", href: "/legal-docs/WS Cookie Policy 1.pdf" },
+      { label: "Terms of Business", href: "/legal-docs/WS Terms of Business.pdf" },
+      { label: "Order Execution Policy", href: "/legal-docs/WorldStreet Order Execution Policy 1.pdf" },
+      { label: "Campaign Managers Program T&C", href: "/legal-docs/WS Campaign Managers Program Terms and Condition.pdf" },
+    ]
+  },
   { label: "Pricing", href: "/#pricing" },
 ];
 
@@ -45,13 +65,37 @@ export default function Header() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
-              >
-                {link.label}
-              </a>
+              <div key={link.label} className="relative group">
+                <a
+                  href={link.href}
+                  className="text-sm text-gray-400 hover:text-white transition-colors duration-200 flex items-center gap-1 py-4"
+                >
+                  {link.label}
+                  {link.dropdown && (
+                    <svg className="w-3 h-3 text-gray-400 group-hover:text-white transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  )}
+                </a>
+                {link.dropdown && (
+                  <div className="absolute top-[100%] left-0 hidden group-hover:block pt-2 w-80 z-50">
+                    <div className="bg-[#050505] border border-white/10 rounded-xl shadow-2xl py-3 flex flex-col backdrop-blur-xl">
+                      {link.dropdown.map((subLink) => (
+                        <a
+                          key={subLink.label}
+                          href={subLink.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="px-6 py-3 text-[11px] text-gray-300 hover:text-white hover:bg-white/5 transition-colors uppercase tracking-widest font-bold font-sans"
+                        >
+                          {subLink.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -79,19 +123,38 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <nav className="md:hidden border-t border-white/5 px-6 py-4 flex flex-col gap-4">
+          <nav className="md:hidden border-t border-white/5 px-6 py-4 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
             {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                {link.label}
-              </a>
+              <div key={link.label} className="flex flex-col gap-2">
+                <a
+                  href={link.href}
+                  onClick={() => !link.dropdown && setMobileOpen(false)}
+                  className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                >
+                  {link.label}
+                </a>
+                {link.dropdown && (
+                  <div className="pl-4 flex flex-col gap-3 py-2 border-l border-white/10 ml-2">
+                    {link.dropdown.map((subLink) => (
+                      <a
+                        key={subLink.label}
+                        href={subLink.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                        onClick={() => setMobileOpen(false)}
+                        className="text-xs text-gray-500 hover:text-white uppercase tracking-wider font-medium"
+                      >
+                        {subLink.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             <a
               href="#contact"
+              onClick={() => setMobileOpen(false)}
               className="mt-2 px-5 py-2.5 rounded-full border border-white/20 text-sm font-medium text-white text-center hover:bg-white/10 transition-all"
             >
               Get in Touch
