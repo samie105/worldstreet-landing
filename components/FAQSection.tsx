@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Plus, Minus } from "lucide-react";
+import Link from "next/link";
 
 const defaultFaqs = [
   {
@@ -85,13 +86,13 @@ export default function FAQSection({
             <div className="flex flex-col h-full">
               <div className="flex-1 border-b border-white/[0.08] hidden md:block" />
               <div className="flex-1 p-6 md:p-10 flex items-center justify-start md:justify-end">
-                <a
-                  href="#"
+                <Link
+                  href="/register"
                   className="inline-flex items-center gap-3 text-[#FFCC2D] text-[15px] font-medium hover:text-[#FFE066] transition-colors group"
                 >
                   Create account now
                   <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function CTASection() {
   return (
     <section className="relative w-full py-32 px-6 flex flex-col items-center justify-center text-center overflow-hidden">
@@ -14,8 +16,8 @@ export default function CTASection() {
       {/* Button with glow */}
       <div className="relative group">
         <div className="absolute -inset-1 rounded-full bg-[#FFCC2D] opacity-30 group-hover:opacity-50 blur-lg transition duration-500" />
-        <a
-          href="#"
+        <Link
+          href="/register"
           className="relative inline-flex items-center gap-2 bg-[#FFCC2D] text-black px-8 py-4 rounded-[100px] font-medium hover:scale-105 transition-transform duration-300"
         >
           Get started now
@@ -23,7 +25,7 @@ export default function CTASection() {
             <path d="M7 17L17 7" />
             <path d="M7 7h10v10" />
           </svg>
-        </a>
+        </Link>
       </div>
     </section>
   );
