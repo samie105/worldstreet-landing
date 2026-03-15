@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSignIn, useSignUp, useAuth } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 
@@ -9,8 +10,8 @@ const DASHBOARD_URL = "https://dashboard.worldstreetgold.com/";
 export default function AuthArea({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode === "register";
   const { isSignedIn, isLoaded: isAuthLoaded } = useAuth();
-  const { signIn, isLoaded: isSignInLoaded } = useSignIn();
-  const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
+  const { signIn, fetchStatus: signInFetchStatus } = useSignIn();
+  const { signUp, fetchStatus: signUpFetchStatus } = useSignUp();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -28,16 +29,16 @@ export default function AuthArea({ mode }: { mode: "login" | "register" }) {
     setIsLoading(true);
     try {
       if (isRegister) {
-        await signUp?.authenticateWithRedirect({
+        await signUp?.sso({
           strategy: "oauth_google",
           redirectUrl: "/sso-callback",
-          redirectUrlComplete: DASHBOARD_URL,
+          redirectCallbackUrl: DASHBOARD_URL,
         });
       } else {
-        await signIn?.authenticateWithRedirect({
+        await signIn?.sso({
           strategy: "oauth_google",
           redirectUrl: "/sso-callback",
-          redirectUrlComplete: DASHBOARD_URL,
+          redirectCallbackUrl: DASHBOARD_URL,
         });
       }
     } catch (error) {
@@ -48,14 +49,16 @@ export default function AuthArea({ mode }: { mode: "login" | "register" }) {
 
   if (isAuthLoaded && isSignedIn) return null;
 
-  const isLoaded = isRegister ? isSignUpLoaded : isSignInLoaded;
+  const isReady = isRegister
+    ? signUpFetchStatus === "idle"
+    : signInFetchStatus === "idle";
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-32 overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand/[0.04] blur-[120px]" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-brand/4 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-white/6 to-transparent" />
       </div>
 
       <div className="relative w-full max-w-md">
@@ -63,9 +66,11 @@ export default function AuthArea({ mode }: { mode: "login" | "register" }) {
         <div className="flex justify-center mb-10">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-9 h-9 flex items-center justify-center">
-              <img
+              <Image
                 src="/worldstreet-logo/WorldStreet4.png"
                 alt="Worldstreet Logo"
+                width={36}
+                height={36}
                 className="w-full h-full object-contain"
               />
             </div>
@@ -112,8 +117,8 @@ export default function AuthArea({ mode }: { mode: "login" | "register" }) {
           {/* Google OAuth Button */}
           <button
             onClick={handleGoogleAuth}
-            disabled={!isLoaded || isLoading}
-            className="group relative w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl border border-white/10 bg-white/[0.03] text-white font-medium text-sm transition-all duration-300 hover:bg-white/[0.07] hover:border-white/20 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            disabled={!isReady || isLoading}
+            className="group relative w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl border border-white/10 bg-white/3 text-white font-medium text-sm transition-all duration-300 hover:bg-white/7 hover:border-white/20 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {/* Google icon */}
             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -148,11 +153,11 @@ export default function AuthArea({ mode }: { mode: "login" | "register" }) {
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <div className="flex-1 h-px bg-white/6" />
             <span className="text-[11px] uppercase tracking-widest text-gray-500 font-medium">
               Secure & Trusted
             </span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <div className="flex-1 h-px bg-white/6" />
           </div>
 
           {/* Trust badges */}
