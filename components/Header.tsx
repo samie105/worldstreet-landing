@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@clerk/nextjs";
+
+const DASHBOARD_URL = "https://dashboard.worldstreetgold.com/";
 
 type NavLink = {
   label: string;
@@ -34,6 +37,7 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const { isSignedIn, isLoaded } = useAuth();
 
   useEffect(() => {
     const onScroll = () => {
@@ -100,13 +104,30 @@ export default function Header() {
           </nav>
 
           {/* CTA */}
-          <div className="hidden md:flex items-center">
-            <a
-              href="#contact"
-              className="px-5 py-2.5 rounded-full border border-white/20 text-sm font-medium text-white hover:bg-white/10 transition-all duration-200"
-            >
-              Get in Touch
-            </a>
+          <div className="hidden md:flex items-center gap-3">
+            {isLoaded && isSignedIn ? (
+              <a
+                href={DASHBOARD_URL}
+                className="px-5 py-2.5 rounded-full bg-brand text-black text-sm font-semibold hover:bg-brand/90 transition-all duration-200"
+              >
+                Dashboard
+              </a>
+            ) : (
+              <>
+                <a
+                  href="/login"
+                  className="px-5 py-2.5 rounded-full border border-white/20 text-sm font-medium text-white hover:bg-white/10 transition-all duration-200"
+                >
+                  Sign In
+                </a>
+                <a
+                  href="/register"
+                  className="px-5 py-2.5 rounded-full bg-brand text-black text-sm font-semibold hover:bg-brand/90 transition-all duration-200"
+                >
+                  Get Started
+                </a>
+              </>
+            )}
           </div>
 
           {/* Mobile Hamburger */}
@@ -152,13 +173,32 @@ export default function Header() {
                 )}
               </div>
             ))}
-            <a
-              href="#contact"
-              onClick={() => setMobileOpen(false)}
-              className="mt-2 px-5 py-2.5 rounded-full border border-white/20 text-sm font-medium text-white text-center hover:bg-white/10 transition-all"
-            >
-              Get in Touch
-            </a>
+            {isLoaded && isSignedIn ? (
+              <a
+                href={DASHBOARD_URL}
+                onClick={() => setMobileOpen(false)}
+                className="mt-2 px-5 py-2.5 rounded-full bg-brand text-black text-sm font-semibold text-center hover:bg-brand/90 transition-all"
+              >
+                Dashboard
+              </a>
+            ) : (
+              <div className="flex flex-col gap-2 mt-2">
+                <a
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="px-5 py-2.5 rounded-full border border-white/20 text-sm font-medium text-white text-center hover:bg-white/10 transition-all"
+                >
+                  Sign In
+                </a>
+                <a
+                  href="/register"
+                  onClick={() => setMobileOpen(false)}
+                  className="px-5 py-2.5 rounded-full bg-brand text-black text-sm font-semibold text-center hover:bg-brand/90 transition-all"
+                >
+                  Get Started
+                </a>
+              </div>
+            )}
           </nav>
         )}
       </div>

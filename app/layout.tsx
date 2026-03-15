@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import SmoothScrollProvider from "../providers/SmoothScrollProvider";
 
@@ -24,12 +25,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${spaceGrotesk.variable} ${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>
-        <SmoothScrollProvider>
-          {children}
-        </SmoothScrollProvider>
-      </body>
-    </html>
+    <ClerkProvider
+      telemetry={false}
+      domain="worldstreetgold.com"
+      isSatellite={false}
+    >
+      <html lang="en" className="dark">
+        <body className={`${spaceGrotesk.variable} ${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
