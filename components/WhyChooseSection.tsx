@@ -119,7 +119,7 @@ export default function WhyChooseSection() {
   }, []);
 
   return (
-    <section className="relative z-10 bg-[#050505]">
+    <section id="features" className="relative z-10 bg-[#050505]">
       {/* Why Choose Header */}
       <div className="text-center pt-28 pb-16 px-6 relative z-10">
         <h2 className="text-3xl md:text-[40px] font-medium tracking-tight text-white mb-4">

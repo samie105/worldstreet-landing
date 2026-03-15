@@ -21,11 +21,11 @@ export default function Footer() {
           {/* Output structure for links, similar to screenshot */}
           <div className="flex flex-col gap-5">
             <h4 className="text-white font-medium mb-1">Navigation</h4>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Why Worldstreet?</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Cryptos</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">How it works</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">FAQ</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">404</a>
+            <a href="/#features" className="text-gray-400 hover:text-white transition-colors">Why Worldstreet?</a>
+            <a href="/leaderboard" className="text-gray-400 hover:text-white transition-colors">Cryptos</a>
+            <a href="/#features" className="text-gray-400 hover:text-white transition-colors">How it works</a>
+            <a href="/#faq" className="text-gray-400 hover:text-white transition-colors">FAQ</a>
+            <a href="/register" className="text-gray-400 hover:text-white transition-colors">Get Started</a>
           </div>
 
           <div className="flex flex-col gap-5">

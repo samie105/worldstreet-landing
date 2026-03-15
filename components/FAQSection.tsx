@@ -63,7 +63,7 @@ export default function FAQSection({
   };
 
   return (
-    <section className="bg-[#050505] w-full border-t border-white/[0.08]">
+    <section id="faq" className="bg-[#050505] w-full border-t border-white/[0.08]">
       
       {/* Header Row Wrapper - Full width bottom border */}
       <div className="w-full border-b border-white/[0.08]">

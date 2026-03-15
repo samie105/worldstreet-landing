@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function CTASection() {
   return (
-    <section className="relative w-full py-32 px-6 flex flex-col items-center justify-center text-center overflow-hidden">
+    <section id="pricing" className="relative w-full py-32 px-6 flex flex-col items-center justify-center text-center overflow-hidden">
       {/* Background glow or subtle gradient if needed */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#FFCC2D]/5 blur-[120px] rounded-[100%] pointer-events-none" />
 
