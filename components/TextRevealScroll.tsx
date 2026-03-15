@@ -42,11 +42,8 @@ function Word({ word, progress, range }: { word: string, progress: any, range: [
   const filter = useMotionTemplate`blur(${blurVal}px)`;
   
   return (
-    <span className="relative inline-block">
-      <span className="absolute opacity-0 text-white">{word}</span>
-      <motion.span style={{ opacity, filter }} className="text-white relative z-10 inline-block">
-        {word}
-      </motion.span>
-    </span>
+    <motion.span style={{ opacity, filter }} className="text-white inline-block">
+      {word}
+    </motion.span>
   );
 }

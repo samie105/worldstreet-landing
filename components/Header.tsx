@@ -13,7 +13,7 @@ const navLinks: NavLink[] = [
   { label: "About Us", href: "/about" },
   { label: "Features", href: "/#features" },
   { 
-    label: "Leaderboard", 
+    label: "Legal", 
     href: "/leaderboard",
     dropdown: [
       { label: "Privacy Policy", href: "/legal-docs/Privacy Policy.pdf" },
@@ -52,14 +52,14 @@ export default function Header() {
         visible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="bg-transparent">
+      <div className="bg-black/40 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 flex items-center justify-center">
               <img src="/worldstreet-logo/WorldStreet4.png" alt="Worldstreet Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white">Worldstreet.</span>
+            <span className="text-xl font-bold tracking-tight"><span className="text-white">World</span><span className="text-[#FFCC2D]">Street</span><span className="text-white">.</span></span>
           </a>
 
           {/* Desktop Nav */}
@@ -123,7 +123,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <nav className="md:hidden border-t border-white/5 px-6 py-4 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+          <nav className="md:hidden border-t border-white/[0.06] bg-black/60 backdrop-blur-xl px-6 py-4 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
             {navLinks.map((link) => (
               <div key={link.label} className="flex flex-col gap-2">
                 <a

@@ -40,7 +40,7 @@ export default function DashboardPreview() {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           
           <img 
-            src="/dashboard.png" 
+            src="/landing-page-image.png" 
             alt="Platform Dashboard Preview" 
             className="w-full h-auto object-cover block" 
             // Handle error visually if the image isn't available yet
