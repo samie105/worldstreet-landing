@@ -1,57 +1,64 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
   {
-    title: "Digital Gold.",
-    subtitle: "Trade the future of finance.",
-    description: "Dive deep into the world of cryptocurrency. Trade Bitcoin, Ethereum, and emerging altcoins with advanced charting tools, real-time data, and institutional-grade security. Build your digital portfolio and capitalize on market volatility all from a single unified interface.",
+    title: "Cryptocurrencies",
+    description: "TRADE CFDS ON POPULAR CRYPTOCURRENCIES INCLUDING BITCOIN, ETHEREUM, RIPPLE AND LITECOIN AGAINST THE WORLD'S DOMINANT CURRENCIES AND BUILD YOUR CRYPTO PORTFOLIO",
     image: "/attachments/bitcoin-bg.jpeg",
+    href: "/register",
+    comingSoon: false,
   },
   {
-    title: "Wall Street, Pocket Sized.",
-    subtitle: "Ride the market bull.",
-    description: "Access global stock markets right from your fingertips. Invest in your favorite companies, track market trends, and build wealth over time. Enjoy zero-commission trading, fractional shares, and comprehensive financial reports to make informed stock market decisions.",
+    title: "Vivid AI",
+    description: "AI-POWERED TRADING DECISIONS AND MARKET ANALYSIS. LET ARTIFICIAL INTELLIGENCE GUIDE YOUR TRADING STRATEGY",
     image: "/attachments/bull.jpeg",
+    href: "/register",
+    comingSoon: true,
   },
   {
-    title: "Trade Together.",
-    subtitle: "Grow alongside the community.",
-    description: "Join a thriving community of seasoned traders and ambitious beginners. Share strategies, copy top-performing portfolios, and participate in live trading sessions. Our social trading features ensure you never have to navigate the markets alone.",
-    image: "/attachments/community-bg.jpg",
-  },
-  {
-    title: "Shop the Ecosystem.",
-    subtitle: "Seamless global commerce.",
-    description: "A borderless marketplace built for the modern economy. Browse, buy, and sell goods globally using your trading profits or crypto balances. Experience instant settlements, unparalleled security, and a unified shopping and trading ecosystem.",
+    title: "e-Commerce",
+    description: "ACCESS OUR PRODUCT MARKETPLACE. BUY AND SELL DIGITAL AND PHYSICAL GOODS IN OUR GROWING ECOSYSTEM",
     image: "/attachments/ecommmerce.jpeg",
+    href: "/register",
+    comingSoon: false,
   },
   {
-    title: "Master the Macro.",
-    subtitle: "Forex trading without borders.",
-    description: "Navigate global currency changes with lightning-fast execution. Trade major, minor, and exotic pairs with deep liquidity and tight spreads. Utilize advanced technical indicators and economic calendars to stay ahead of international market movements.",
+    title: "Forex Markets",
+    description: "TRADE MAJOR AND MINOR CURRENCY PAIRS WITH TIGHT SPREADS, NAIRA DEPOSITS, AND $50 MINIMUM TO START",
     image: "/attachments/forex.jpeg",
+    href: "/register",
+    comingSoon: false,
   },
   {
-    title: "Unfiltered Insights.",
-    subtitle: "Listen, learn, and leverage.",
-    description: "Unlock premium market analysis through exclusive podcasts, live streams, and expert articles. Stay updated on the latest financial news, listen to industry leaders, and gain the edge you need to anticipate market trends correctly.",
+    title: "Xtreme",
+    description: "ENTERTAINMENT AND STREAMING PLATFORM. ACCESS EXCLUSIVE CONTENT AND CONNECT WITH THE COMMUNITY",
     image: "/attachments/streaming.jpeg",
+    href: "/register",
+    comingSoon: false,
+  },
+  {
+    title: "Community",
+    description: "JOIN THE CONVERSATION. CONNECT WITH FELLOW TRADERS, SHARE INSIGHTS, AND PARTICIPATE IN DISCUSSIONS TO GROW TOGETHER",
+    image: "/attachments/community-bg.jpg",
+    href: "/register",
+    comingSoon: false,
   },
 ];
 
+const VISIBLE = 3;
+
 export default function OpportunitiesSlider() {
-  const [selectedSlide, setSelectedSlide] = useState<{ slide: typeof slides[0], index: number } | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const total = slides.length;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const prev = () => setCurrent((c) => (c - 1 + total) % total);
+  const next = () => setCurrent((c) => (c + 1) % total);
 
-  const repeatedSlides = [...slides, ...slides, ...slides];
+  const visibleSlides = Array.from({ length: VISIBLE }, (_, i) => slides[(current + i) % total]);
 
   return (
     <section className="py-24 relative z-10 bg-[#050505] overflow-hidden">
@@ -65,100 +72,81 @@ export default function OpportunitiesSlider() {
         </p>
       </div>
 
-      <div className="w-full border-y border-white/[0.08] relative bg-[#050505]">
-        {/* Faded edges to mask the scrolling edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-[#050505] to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-[#050505] to-transparent z-10 pointer-events-none" />
+      {/* Slider */}
+      <div className="relative max-w-[1300px] mx-auto px-4 sm:px-10">
+        {/* Prev */}
+        <button
+          onClick={prev}
+          aria-label="Previous"
+          className="absolute left-0 sm:-left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5 text-white" />
+        </button>
 
-        <div className="flex w-max animate-marquee-left">
-          {repeatedSlides.map((slide, i) => (
-            <motion.div 
-              layoutId={`card-${i}`}
-              onClick={() => setSelectedSlide({ slide, index: i })}
-              key={i} 
-              className="relative w-[75vw] sm:w-[320px] md:w-[400px] aspect-square flex-shrink-0 group overflow-hidden border-r border-white/[0.08] cursor-pointer"
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {visibleSlides.map((slide, position) => (
+            <div
+              key={`${current}-${position}`}
+              className="relative rounded-2xl overflow-hidden h-[420px] md:h-[480px] group"
             >
-              <motion.div 
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105"
+              {/* Background image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                 style={{ backgroundImage: `url(${slide.image})` }}
               />
-              {/* Dark overlay for readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-              
-              <motion.div className="absolute bottom-0 left-0 p-6 md:p-8 w-full">
-                <motion.h3 layoutId={`title-${i}`} className="text-xl md:text-2xl font-bold text-white mb-1.5">{slide.title}</motion.h3>
-                <p className="text-gray-300 transform translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 font-body text-sm md:text-base">
-                  {slide.subtitle}
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
+
+              {/* Coming Soon badge */}
+              {slide.comingSoon && (
+                <div className="absolute top-4 right-4 z-10 px-3 py-1 rounded-full bg-[#F4845F] text-white text-[11px] font-bold tracking-widest uppercase">
+                  Coming Soon
+                </div>
+              )}
+
+              {/* Content */}
+              <div className="absolute bottom-0 left-0 p-6 w-full z-10">
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">{slide.title}</h3>
+                <p className="text-[11px] font-semibold tracking-wider text-gray-300 uppercase leading-relaxed mb-5">
+                  {slide.description}
                 </p>
-              </motion.div>
-            </motion.div>
+                <Link
+                  href={slide.href}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#3DBDB5] hover:bg-[#35A9A2] text-white text-sm font-bold transition-colors"
+                >
+                  <span>→</span> Enter
+                </Link>
+              </div>
+            </div>
           ))}
         </div>
+
+        {/* Next */}
+        <button
+          onClick={next}
+          aria-label="Next"
+          className="absolute right-0 sm:-right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-colors"
+        >
+          <ChevronRight className="w-5 h-5 text-white" />
+        </button>
       </div>
 
-      {/* Expanded Modal */}
-      {mounted && createPortal(
-        <AnimatePresence>
-          {selectedSlide && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md"
-              onClick={() => setSelectedSlide(null)}
-            >
-              <motion.div
-                layoutId={`card-${selectedSlide.index}`}
-                className="relative w-full max-w-2xl aspect-[4/3] sm:aspect-video rounded-none overflow-hidden cursor-default shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div 
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${selectedSlide.slide.image})` }}
-                />
-                {/* Dark overlays for better text readability */}
-                <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/90 to-transparent" />
-                
-                <div className="absolute bottom-0 left-0 p-6 sm:p-10 w-full z-10">
-                  <motion.h3 
-                    layoutId={`title-${selectedSlide.index}`} 
-                    className="text-2xl sm:text-4xl font-bold text-white mb-2"
-                  >
-                    {selectedSlide.slide.title}
-                  </motion.h3>
-                  <motion.p 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="text-gray-200 font-body text-base sm:text-lg max-w-lg mb-2"
-                  >
-                    {selectedSlide.slide.subtitle}
-                  </motion.p>
-                  <motion.p 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="text-gray-300 font-body text-xs sm:text-sm max-w-lg mb-6 leading-relaxed"
-                  >
-                    {selectedSlide.slide.description}
-                  </motion.p>
-                  <motion.button 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="px-5 py-2.5 bg-white text-black text-sm font-medium rounded-none hover:bg-gray-200 transition-colors"
-                    onClick={() => setSelectedSlide(null)}
-                  >
-                    Close
-                  </motion.button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      {/* Dot indicators */}
+      <div className="flex items-center justify-center gap-2 mt-8">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            aria-label={`Go to slide ${i + 1}`}
+            className={`rounded-full transition-all duration-300 ${
+              i === current
+                ? "w-6 h-2 bg-white"
+                : "w-2 h-2 bg-white/30 hover:bg-white/50"
+            }`}
+          />
+        ))}
+      </div>
     </section>
   );
 }

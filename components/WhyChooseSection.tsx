@@ -174,7 +174,7 @@ export default function WhyChooseSection() {
               </p>
               <div>
                 <Link href="/register" className="inline-flex items-center gap-2 text-[#FFCC2D] text-[15px] font-medium hover:text-white transition-colors">
-                  Buy crypto now
+                  Start trading now
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
                 </Link>
               </div>
