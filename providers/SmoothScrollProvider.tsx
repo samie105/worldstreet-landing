@@ -19,6 +19,21 @@ export default function SmoothScrollProvider({
       touchMultiplier: 2,
     });
 
+    // Lenis overrides native scroll so hash anchors (#features, #faq, etc.)
+    // must be forwarded manually via lenis.scrollTo()
+    const scrollToHash = (hash: string) => {
+      if (!hash) return;
+      const el = document.querySelector(hash);
+      if (el) lenis.scrollTo(el as HTMLElement, { offset: -80, duration: 1.2 });
+    };
+
+    // Scroll to hash on initial page load
+    if (window.location.hash) scrollToHash(window.location.hash);
+
+    // Handle hash changes triggered by link clicks
+    const onHashChange = () => scrollToHash(window.location.hash);
+    window.addEventListener("hashchange", onHashChange);
+
     function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
@@ -28,6 +43,7 @@ export default function SmoothScrollProvider({
 
     return () => {
       lenis.destroy();
+      window.removeEventListener("hashchange", onHashChange);
     };
   }, []);
 

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="w-full bg-[#050505] border-t border-[rgba(255,255,255,0.05)] text-gray-400 py-16 px-6">
@@ -21,11 +23,11 @@ export default function Footer() {
           {/* Output structure for links, similar to screenshot */}
           <div className="flex flex-col gap-5">
             <h4 className="text-white font-medium mb-1">Navigation</h4>
-            <a href="/#features" className="text-gray-400 hover:text-white transition-colors">Why Worldstreet?</a>
-            <a href="/leaderboard" className="text-gray-400 hover:text-white transition-colors">Cryptos</a>
-            <a href="/#features" className="text-gray-400 hover:text-white transition-colors">How it works</a>
-            <a href="/#faq" className="text-gray-400 hover:text-white transition-colors">FAQ</a>
-            <a href="/register" className="text-gray-400 hover:text-white transition-colors">Get Started</a>
+            <Link href="/#features" className="text-gray-400 hover:text-white transition-colors">Why Worldstreet?</Link>
+            <Link href="/leaderboard" className="text-gray-400 hover:text-white transition-colors">Cryptos</Link>
+            <Link href="/#features" className="text-gray-400 hover:text-white transition-colors">How it works</Link>
+            <Link href="/#faq" className="text-gray-400 hover:text-white transition-colors">FAQ</Link>
+            <Link href="/register" className="text-gray-400 hover:text-white transition-colors">Get Started</Link>
           </div>
 
           <div className="flex flex-col gap-5">
