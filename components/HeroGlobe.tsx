@@ -77,6 +77,18 @@ function StarField() {
 }
 
 export default function HeroGlobe() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    // React doesn't always serialize `muted` as a DOM attribute — set it directly
+    video.muted = true;
+    video.play().catch(() => {
+      // Autoplay blocked — silently ignore, video stays as static poster
+    });
+  }, []);
+
   return (
     <div className="relative w-full overflow-hidden flex flex-col items-center justify-center min-h-screen bg-[#050505] after:absolute after:inset-x-0 after:bottom-0 after:h-40 after:bg-gradient-to-t after:from-[#050505] after:to-transparent after:z-20 after:pointer-events-none">
       {/* Animated star field background */}
@@ -85,6 +97,7 @@ export default function HeroGlobe() {
       {/* Earth Video — full-width, anchored to bottom, clipped */}
       <div className="absolute bottom-[-30%] md:bottom-[-80%] left-1/2 -translate-x-1/2 w-[min(1600px,160vw)] aspect-square z-[1] pointer-events-none">
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
