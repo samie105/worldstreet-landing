@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Cormorant_Garamond, Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import SmoothScrollProvider from "../providers/SmoothScrollProvider";
 
-const spaceGrotesk = Space_Grotesk({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-sans",
 });
 
@@ -31,7 +33,7 @@ export default function RootLayout({
       isSatellite={false}
     >
       <html lang="en" className="dark">
-        <body className={`${spaceGrotesk.variable} ${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>
+        <body className={`${cormorant.variable} ${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>
           <SmoothScrollProvider>
             {children}
           </SmoothScrollProvider>
