@@ -5,7 +5,7 @@
 ## Project
 
 - **Slug**: `landing-page`
-- **API**: `http://localhost:3000`
+- **API**: `https://remb.vercel.app`
 - **Config**: `.remb.yml` (committed, no secrets)
 
 ## What is Remb?
@@ -225,7 +225,7 @@ Add Remb as an MCP server in your IDE for direct AI tool access:
 }
 ```
 
-Or connect to the hosted endpoint at `http://localhost:3000/api/mcp` for aggregated MCP access with all your connected servers.
+Or connect to the hosted endpoint at `https://remb.vercel.app/api/mcp` for aggregated MCP access with all your connected servers.
 
 ## Exit Codes
 
