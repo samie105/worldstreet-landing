@@ -7,10 +7,10 @@ export default function CTASection() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#FFCC2D]/5 blur-[120px] rounded-[100%] pointer-events-none" />
 
       <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-white mb-6 max-w-3xl">
-        Ready to take control<br />of your crypto?
+        Ready to take control<br />of your finances?
       </h2>
       <p className="text-gray-400 text-lg md:text-xl max-w-2xl mb-10">
-        Join thousands of users who trust Worldstreet for secure, seamless, and efficient cryptocurrency transactions.
+        Join thousands of users who trust Worldstreet for secure, seamless, and efficient financial transactions.
       </p>
 
       {/* Button with glow */}
