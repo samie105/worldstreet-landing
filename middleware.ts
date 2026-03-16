@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const DASHBOARD_URL = "https://dashboard.worldstreetgold.com/";
+const DASHBOARD_URL = "https://dashboardv2.worldstreetgold.com/";
 const isAuthRoute = createRouteMatcher(["/login", "/register"]);
 
 export default clerkMiddleware(async (auth, req) => {
