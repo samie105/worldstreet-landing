@@ -113,7 +113,7 @@ export default function OpportunitiesSlider() {
                 </p>
                 <Link
                   href={slide.href}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#3DBDB5] hover:bg-[#35A9A2] text-white text-sm font-bold transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFCC2D] hover:bg-[#FFCC2D]/90 text-black text-sm font-bold transition-colors"
                 >
                   <span>→</span> Enter
                 </Link>
