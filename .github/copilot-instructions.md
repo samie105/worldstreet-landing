@@ -46,6 +46,11 @@ These calls ensure context persists across sessions. Skipping them causes knowle
 - `remb__scan_status` — check scan progress
 - `remb__diff_analyze` — analyze a git diff and save extracted changes
 
+**Cross-Project:**
+- `remb__cross_project_search` — search across ALL projects for features, context, and memories
+- `remb__context_bundle` — also works with other project slugs to load another project's full context
+- `remb__memory_create` — create with no project_id to save global preferences that apply everywhere
+
 ## When to Use Each Tool
 
 - **Starting a session** → `conversation_history` + `memory_load_context`
@@ -53,4 +58,15 @@ These calls ensure context persists across sessions. Skipping them causes knowle
 - **Saving knowledge** → `context_save` (feature-specific) or `memory_create` (cross-cutting)
 - **After code changes** → `scan_trigger` to refresh, `diff_analyze` for targeted analysis
 - **Finishing work** → `conversation_log` with summary of what was accomplished
+
+## Cross-Project Referencing
+
+When the user says "do it like I did in project X" or references another project:
+
+1. Call `remb__projects_list` to find available projects
+2. Call `remb__cross_project_search` with the concept to find matching patterns across all projects
+3. Call `remb__context_bundle` with the other project's slug to load its full context
+4. Apply the patterns from that project to the current work
+
+**Global preferences** — memories created without a project_id apply to ALL projects. Use `remb__memory_create` with category "preference" and no project_id to save cross-project coding standards.
 <!-- remb:end -->

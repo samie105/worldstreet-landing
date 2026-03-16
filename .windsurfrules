@@ -40,6 +40,11 @@ Project: landing-page | API: https://remb.vercel.app
 - `remb__scan_status` — check scan progress
 - `remb__diff_analyze` — analyze a git diff and save extracted changes
 
+**Cross-Project:**
+- `remb__cross_project_search` — search across ALL projects for features, context, and memories
+- `remb__context_bundle` — also works with other project slugs to load another project's full context
+- `remb__memory_create` — create with no project_id to save global preferences that apply everywhere
+
 ## Quick Reference
 
 - Starting: conversation_history + memory_load_context
@@ -47,4 +52,5 @@ Project: landing-page | API: https://remb.vercel.app
 - Save knowledge: context_save (feature) or memory_create (general)
 - After changes: scan_trigger or diff_analyze
 - Finishing: conversation_log
+- Reference another project: cross_project_search + context_bundle
 <!-- remb:end -->

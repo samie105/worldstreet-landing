@@ -83,7 +83,7 @@ export default function HeroGlobe() {
       <StarField />
 
       {/* Earth Video — full-width, anchored to bottom, clipped */}
-      <div className="absolute bottom-[-30%] md:bottom-[-70%] left-1/2 -translate-x-1/2 w-[min(1600px,160vw)] aspect-square z-[1] pointer-events-none">
+      <div className="absolute bottom-[-30%] md:bottom-[-80%] left-1/2 -translate-x-1/2 w-[min(1600px,160vw)] aspect-square z-[1] pointer-events-none">
         <video
           autoPlay
           loop

@@ -42,4 +42,13 @@ These rules MUST be followed in every session:
 - `remb__scan_trigger` — trigger a cloud scan
 - `remb__scan_status` — check scan progress
 - `remb__diff_analyze` — analyze a git diff and save extracted changes
+
+**Cross-Project:**
+- `remb__cross_project_search` — search across ALL projects for features, context, and memories
+- `remb__context_bundle` — also works with other project slugs to load another project's full context
+- `remb__memory_create` — create with no project_id to save global preferences that apply everywhere
+
+## Cross-Project
+
+When told "implement it like in project X", use `cross_project_search` to find patterns across projects, then `context_bundle` with the other project's slug.
 <!-- remb:end -->
