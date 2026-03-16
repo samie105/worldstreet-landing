@@ -88,7 +88,7 @@ export default function OpportunitiesSlider() {
           {visibleSlides.map((slide, position) => (
             <div
               key={`${current}-${position}`}
-              className="relative rounded-2xl overflow-hidden h-[420px] md:h-[480px] group"
+              className={`relative rounded-2xl overflow-hidden h-[420px] md:h-[480px] group${position > 0 ? " hidden md:block" : ""}`}
             >
               {/* Background image */}
               <div
