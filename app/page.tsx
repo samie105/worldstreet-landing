@@ -14,10 +14,10 @@ export default function Home() {
     <main className="flex flex-col w-full relative">
       <Header />
       <HeroGlobe />
+      <OpportunitiesSlider />
       <TickerMarquee />
 
       <WhyChooseSection />
-      <OpportunitiesSlider />
 
       <TextRevealScroll />
       <DashboardPreview />
