@@ -14,9 +14,9 @@ export default function Home() {
     <main className="flex flex-col w-full relative">
       <Header />
       <HeroGlobe />
-      
-      <WhyChooseSection />
       <TickerMarquee />
+
+      <WhyChooseSection />
       <OpportunitiesSlider />
 
       <TextRevealScroll />
