@@ -117,7 +117,7 @@ export default function HeroGlobe() {
       <div className="relative z-10 text-center max-w-3xl mx-auto px-6 mb-[28vh]">
         <p className="text-xs font-medium tracking-widest uppercase text-gray-400 mb-7">Introducing The WorldStreet Ecosystem</p>
 
-        <h1 className="text-5xl md:text-6xl lg:text-[76px] font-semibold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500 pb-1 leading-[1.05]">
+        <h1 className="text-5xl md:text-6xl lg:text-[76px] font-semibold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-gray-500 to-white pb-1 leading-[1.05]">
           Welcome to the<br />new economy
         </h1>
 
