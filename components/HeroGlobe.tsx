@@ -118,7 +118,7 @@ export default function HeroGlobe() {
         <p className="text-xs font-medium tracking-widest uppercase text-gray-400 mb-7">Introducing WorldStreet Ecosystem</p>
 
         <h1 className="text-5xl md:text-6xl lg:text-[76px] font-semibold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500 pb-1 leading-[1.05]">
-          Welcome to the<br /><span className="italic">World Economy</span>
+          Welcome to the<br />new economy
         </h1>
 
         <p className="text-sm md:text-base text-gray-400 max-w-xl mx-auto mb-9 leading-relaxed font-body">

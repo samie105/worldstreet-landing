@@ -9,7 +9,7 @@
   --color-surface-border: rgba(255, 255, 255, 0.08);
 
   --font-sans: var(--font-sans), sans-serif;
-  --font-body: var(--font-body), sans-serif;
+  --font-body: var(--font-sans), sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }
 
