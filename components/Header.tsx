@@ -35,6 +35,7 @@ const navLinks: NavLink[] = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
   const { isSignedIn, isLoaded } = useAuth();
@@ -146,16 +147,31 @@ export default function Header() {
         {mobileOpen && (
           <nav className="md:hidden border-t border-white/[0.06] bg-black/60 backdrop-blur-xl px-6 py-4 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
             {navLinks.map((link) => (
-              <div key={link.label} className="flex flex-col gap-2">
-                <a
-                  href={link.href}
-                  onClick={() => !link.dropdown && setMobileOpen(false)}
-                  className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
-                >
-                  {link.label}
-                </a>
-                {link.dropdown && (
-                  <div className="pl-4 flex flex-col gap-3 py-2 border-l border-white/10 ml-2">
+              <div key={link.label} className="flex flex-col">
+                {link.dropdown ? (
+                  <button
+                    onClick={() => setOpenDropdown(openDropdown === link.label ? null : link.label)}
+                    className="flex items-center justify-between text-sm font-medium text-gray-300 hover:text-white transition-colors py-1.5 w-full text-left"
+                  >
+                    {link.label}
+                    <svg
+                      className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${openDropdown === link.label ? "rotate-180" : ""}`}
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                ) : (
+                  <a
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-sm font-medium text-gray-300 hover:text-white transition-colors py-1.5"
+                  >
+                    {link.label}
+                  </a>
+                )}
+                {link.dropdown && openDropdown === link.label && (
+                  <div className="pl-4 flex flex-col gap-3 py-3 border-l border-white/10 ml-2 mt-1">
                     {link.dropdown.map((subLink) => (
                       <a
                         key={subLink.label}
