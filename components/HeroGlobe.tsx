@@ -122,8 +122,7 @@ export default function HeroGlobe() {
         </h1>
 
         <p className="text-sm md:text-base text-gray-400 max-w-xl mx-auto mb-9 leading-relaxed font-body">
-          Join millions to securely trade crypto and fiat on a multi-sector digital ecosystem
-          built to empower individuals and businesses worldwide.
+          Built to empower individuals, businesses and nations worldwide.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
