@@ -23,8 +23,6 @@ export default function RootLayout({
   return (
     <ClerkProvider
       telemetry={false}
-      domain="worldstreetgold.com"
-      isSatellite={false}
     >
       <html lang="en" className="dark">
         <body className={`${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>
