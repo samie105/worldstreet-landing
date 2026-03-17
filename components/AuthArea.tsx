@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useSignIn, useSignUp, useAuth } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 
-const DASHBOARD_URL = "https://dashboard.worldstreetgold.com/";
+const DASHBOARD_URL = process.env.NEXT_PUBLIC_DASHBOARD_URL ?? "https://dashboard.worldstreetgold.com/";
 
 export default function AuthArea({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode === "register";
