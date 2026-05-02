@@ -21,7 +21,7 @@ export default function Home() {
 
       <TextRevealScroll />
       <DashboardPreview />
-      
+
       <FAQSection />
 
       <CTASection />

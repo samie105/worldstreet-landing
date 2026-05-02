@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import SmoothScrollProvider from "../providers/SmoothScrollProvider";
-import PasswordOverlay from "../components/PasswordOverlay";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,10 +25,13 @@ export default function RootLayout({
       telemetry={false}
       domain="worldstreetgold.com"
       isSatellite={false}
+      signInUrl="/login"
+      signUpUrl="/register"
+      signInFallbackRedirectUrl="/welcome"
+      signUpFallbackRedirectUrl="/welcome"
     >
       <html lang="en" className="dark">
         <body className={`${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>
-          <PasswordOverlay />
           <SmoothScrollProvider>
             {children}
           </SmoothScrollProvider>

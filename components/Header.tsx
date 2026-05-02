@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
 
-const DASHBOARD_URL = process.env.NEXT_PUBLIC_DASHBOARD_URL ?? "https://dashboard.worldstreetgold.com/";
+const DASHBOARD_URL = "/welcome";
 
 type NavLink = {
   label: string;
