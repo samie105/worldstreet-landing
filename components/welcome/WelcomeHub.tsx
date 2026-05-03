@@ -18,9 +18,9 @@ type Props = {
 };
 
 const ASSET_TABS: { key: AssetClass; label: string }[] = [
+  { key: "fiat", label: "Fiat" },
   { key: "crypto", label: "Crypto" },
   { key: "forex", label: "Forex" },
-  { key: "fiat", label: "Fiat" },
 ];
 
 export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: Props) {
@@ -29,7 +29,7 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
   const heroRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [now, setNow] = useState<string>("");
-  const [assetClass, setAssetClass] = useState<AssetClass>("crypto");
+  const [assetClass, setAssetClass] = useState<AssetClass>("fiat");
 
   // Live clock
   useEffect(() => {
