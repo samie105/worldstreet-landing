@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Worldstreet | Trade Forex and Crypto Markets With Confidence",
-  description: "Join millions to securely trade crypto and fiat on a multi-sector digital ecosystem built to empower individuals and businesses worldwide.",
+  description: "Built to empower individuals, businesses and nations worldwide.",
 };
 
 export default function RootLayout({
@@ -25,6 +25,10 @@ export default function RootLayout({
       telemetry={false}
       domain="worldstreetgold.com"
       isSatellite={false}
+      signInUrl="/login"
+      signUpUrl="/register"
+      signInFallbackRedirectUrl="/welcome"
+      signUpFallbackRedirectUrl="/welcome"
     >
       <html lang="en" className="dark">
         <body className={`${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>
