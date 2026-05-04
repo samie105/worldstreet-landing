@@ -82,10 +82,13 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
   return (
     <div ref={cardRef} className="group relative flex flex-col h-full transition-colors hover:bg-white/[0.025]">
 
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-6 pb-4">
+      {/* Header — tinted container */}
+      <div
+        className="mx-3 mt-3 mb-1 rounded-lg px-3 py-3 flex items-center justify-between"
+        style={{ backgroundColor: platform.cardColor ?? "rgba(255,255,255,0.02)" }}
+      >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+          <div className="w-9 h-9 rounded-md bg-white/[0.06] border border-white/[0.08] flex items-center justify-center">
             <Icon className="w-4 h-4 text-[#FFCC2D]" strokeWidth={1.6} />
           </div>
           <div>
@@ -125,7 +128,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
       </div>
 
       {/* Primary metric (dynamic for Trading) */}
-      <div ref={dynamicRef} className="px-6 pb-4">
+      <div ref={dynamicRef} className="px-6 pt-4 pb-4">
         <div className="text-[9px] uppercase tracking-widest text-gray-500 font-body mb-1">
           {platform.primaryLabel}
           {platform.byAsset && (
