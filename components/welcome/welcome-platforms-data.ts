@@ -121,6 +121,7 @@ export type WelcomePlatform = {
   calls?: CallItem[];
   messages?: ChatMessage[];
   conversations?: AiConversation[];
+  cardColor?: string;
   notifications: Notification[];
 };
 
@@ -192,9 +193,24 @@ const T = {
 
 export const welcomePlatforms: WelcomePlatform[] = [
   {
-    id: "trading",
-    name: "Trading",
-    tagline: "Spot · Futures · Forex · P2P",
+    id: "forex-trading",
+    name: "Forex Trading",
+    tagline: "Spot · Futures · P2P",
+    href: "/trading",
+    accent: "#FFCC2D",
+    icon: LineChart,
+    primaryLabel: "Open P&L",
+    primaryValue: tradingByAsset.forex.primaryValue,
+    status: tradingByAsset.forex.status,
+    sparkline: tradingByAsset.forex.sparkline,
+    history: tradingByAsset.forex.history,
+    cardColor: "rgba(59,130,246,0.035)",
+    notifications: [],
+  },
+  {
+    id: "crypto-trading",
+    name: "Crypto Trading",
+    tagline: "Spot · Futures · Perps · DeFi",
     href: "/trading",
     accent: "#FFCC2D",
     icon: LineChart,
@@ -203,7 +219,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     status: tradingByAsset.crypto.status,
     sparkline: tradingByAsset.crypto.sparkline,
     history: tradingByAsset.crypto.history,
-    byAsset: tradingByAsset,
+    cardColor: "rgba(168,85,247,0.035)",
     notifications: [],
   },
   {
@@ -217,6 +233,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     primaryLabel: "Unread",
     primaryValue: "4 missed",
     status: { label: "12 online now", tone: "positive" },
+    cardColor: "rgba(20,184,166,0.035)",
     calls: [
       { id: "cl1", name: "Trader Jay", type: "video", missed: true, when: "5m ago" },
       { id: "cl2", name: "Sarah Chen", type: "voice", missed: true, when: "22m ago" },
@@ -240,6 +257,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     primaryLabel: "Conversations",
     primaryValue: "5 sessions",
     status: { label: "3 active today", tone: "positive" },
+    cardColor: "rgba(6,182,212,0.035)",
     conversations: [
       {
         id: "ai1",
@@ -287,6 +305,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     primaryLabel: "Continue watching",
     primaryValue: "3 saved",
     status: { label: "6 new titles added", tone: "positive" },
+    cardColor: "rgba(244,63,94,0.03)",
     videos: [
       { id: "vi1", title: "The Trading Floor", host: "Drama · 1h 42m", duration: "74%", thumbnail: T.vision1 },
       { id: "vi2", title: "Inside the Bull Run", host: "Documentary · 58m", duration: "New", thumbnail: T.vision2 },
@@ -306,6 +325,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     primaryLabel: "Active rooms",
     primaryValue: "5 live floors",
     status: { label: "3.4K live now", tone: "positive" },
+    cardColor: "rgba(249,115,22,0.03)",
     videos: [
       { id: "x1", title: "BTC Scalping Floor", host: "Mike Thorne", duration: "Live", live: true, viewers: "1.2K", thumbnail: T.xtreme1 },
       { id: "x2", title: "Forex London Open", host: "Lisa Vance", duration: "Live", live: true, viewers: "842", thumbnail: T.xtreme2 },
@@ -325,6 +345,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     primaryLabel: "In progress",
     primaryValue: "2 courses",
     status: { label: "68% complete", tone: "positive" },
+    cardColor: "rgba(16,185,129,0.035)",
     courses: [
       { id: "co1", title: "Trading Foundations", lessons: "12 lessons", progress: 78, thumbnail: T.course1 },
       { id: "co2", title: "Risk Management Pro", lessons: "8 lessons", progress: 42, thumbnail: T.course2 },
@@ -345,6 +366,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     primaryLabel: "Sales (30d)",
     primaryValue: "$8,765.20",
     status: { label: "+12.4%", tone: "positive" },
+    cardColor: "rgba(245,158,11,0.035)",
     shopItems: [
       { id: "s1", name: "Cold-pressed Olive Oil", price: "$24.99", category: "Food", thumbnail: T.shop1 },
       { id: "s2", name: "Trading Journal", price: "$18.00", category: "Stationery", thumbnail: T.shop2 },
@@ -365,6 +387,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     primaryLabel: "Engagement",
     primaryValue: "+1,840 this week",
     status: { label: "Rank #142", tone: "positive" },
+    cardColor: "rgba(99,102,241,0.035)",
     posts: [
       { id: "p1", author: "Trader Jay", handle: "@trader_jay", text: "BTC printing weekly higher highs — keep an eye on the 72k flip.", likes: "248", when: "12m" },
       { id: "p2", author: "Sarah Chen", handle: "@sarahc", text: "Macro recap from this morning is up. Fed in focus this week.", likes: "184", when: "1h" },

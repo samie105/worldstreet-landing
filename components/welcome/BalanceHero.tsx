@@ -247,22 +247,22 @@ function FiatBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | nul
         </div>
       </div>
 
-      <div className="grid grid-cols-3 border-t border-white/[0.08]">
-        <div className="px-4 py-4 border-r border-white/[0.08]">
+      <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-white/[0.08]">
+        <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Live FX Rates</div>
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             {FIAT_RATES.map((r) => (
-              <div key={r.from + r.to} className="flex items-center justify-between">
-                <span className="text-[11px] text-gray-400">{r.from}/{r.to}</span>
-                <div className="flex items-center gap-1">
-                  {r.trend === "up" ? <TrendingUp className="w-3 h-3 text-emerald-400" /> : <TrendingDown className="w-3 h-3 text-rose-400" />}
-                  <span className="text-[11px] font-medium text-white tabular-nums">{r.rate}</span>
+              <div key={r.from + r.to} className="flex items-center justify-between gap-4">
+                <span className="text-[11px] text-gray-400 shrink-0">{r.from}/{r.to}</span>
+                <div className="flex items-center gap-1.5">
+                  {r.trend === "up" ? <TrendingUp className="w-3 h-3 text-emerald-400 shrink-0" /> : <TrendingDown className="w-3 h-3 text-rose-400 shrink-0" />}
+                  <span className="text-[12px] font-medium text-white tabular-nums">{r.rate}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div className="px-4 py-4 border-r border-white/[0.08]">
+        <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Total (All Currencies)</div>
           <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">$48,210</div>
           <div className="text-[10px] text-gray-500 mt-0.5">2 currencies held</div>

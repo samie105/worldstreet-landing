@@ -66,12 +66,6 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
   const [now, setNow] = useState<string>("");
   const [assetClass, setAssetClass] = useState<AssetClass>("fiat");
 
-  const resolvedPlatforms = welcomePlatforms.map((p) =>
-    p.id === "trading" && assetClass !== "fiat"
-      ? { ...p, name: assetClass === "crypto" ? "Crypto Trading" : "Forex Trading" }
-      : p,
-  );
-
   const [callsOpen, setCallsOpen] = useState(false);
   const [callTab, setCallTab] = useState<"voice" | "video" | "messages">("voice");
   const [contactSearch, setContactSearch] = useState("");
@@ -485,13 +479,13 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
               </p>
             </div>
             <span className="text-[10px] uppercase tracking-widest text-gray-500 font-body">
-              {resolvedPlatforms.length} platforms
+              {welcomePlatforms.length} platforms
             </span>
           </div>
 
           {/* ── Platform quick-nav grid ── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 border-t border-l border-white/[0.08] mb-10">
-            {resolvedPlatforms.map((p) => {
+          <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 border-t border-l border-white/[0.08] mb-10">
+            {welcomePlatforms.map((p) => {
               const PIcon = p.icon;
               const inner = (
                 <>
@@ -526,8 +520,12 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
             className="border-t border-l border-white/[0.08]"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {resolvedPlatforms.map((platform, i) => (
-                <div key={platform.id} className="border-r border-b border-white/[0.08] bg-white/[0.018]">
+              {welcomePlatforms.map((platform, i) => (
+                <div
+                  key={platform.id}
+                  className="border-r border-b border-white/[0.08]"
+                  style={{ backgroundColor: platform.cardColor }}
+                >
                   <PlatformPreviewCard platform={platform} index={i} assetClass={assetClass} />
                 </div>
               ))}
