@@ -65,6 +65,32 @@ export type SocialPost = {
   when: string;
 };
 
+export type CallItem = {
+  id: string;
+  name: string;
+  type: "video" | "voice";
+  missed: boolean;
+  when: string;
+  duration?: string;
+};
+
+export type ChatMessage = {
+  id: string;
+  author: string;
+  text: string;
+  when: string;
+  unread?: boolean;
+};
+
+export type AiConversation = {
+  id: string;
+  title: string;
+  preview: string;
+  when: string;
+  active?: boolean;
+  fromUser?: boolean; // true = last message was from user
+};
+
 export type AssetTradingData = {
   primaryValue: string;
   status: { label: string; tone: "positive" | "negative" | "neutral" };
@@ -92,6 +118,9 @@ export type WelcomePlatform = {
   courses?: Course[];
   shopItems?: ShopItem[];
   posts?: SocialPost[];
+  calls?: CallItem[];
+  messages?: ChatMessage[];
+  conversations?: AiConversation[];
   notifications: Notification[];
 };
 
@@ -175,50 +204,96 @@ export const welcomePlatforms: WelcomePlatform[] = [
     sparkline: tradingByAsset.crypto.sparkline,
     history: tradingByAsset.crypto.history,
     byAsset: tradingByAsset,
-    notifications: [
-      { id: "t1", text: "BTC/USDT order filled", meta: "0.18 BTC · $11,640", tone: "positive", when: "2m ago" },
-      { id: "t2", text: "EUR/USD position opened", meta: "Long · 0.8 lot", tone: "info", when: "18m ago" },
-      { id: "t3", text: "Take-profit hit on SOL", meta: "+$420 secured", tone: "positive", when: "1h ago" },
+    notifications: [],
+  },
+  {
+    id: "community",
+    name: "Community",
+    tagline: "Calls · Messages · Groups",
+    href: "https://community.worldstreetgold.com",
+    external: true,
+    accent: "#FFCC2D",
+    icon: Users,
+    primaryLabel: "Unread",
+    primaryValue: "4 missed",
+    status: { label: "12 online now", tone: "positive" },
+    calls: [
+      { id: "cl1", name: "Trader Jay", type: "video", missed: true, when: "5m ago" },
+      { id: "cl2", name: "Sarah Chen", type: "voice", missed: true, when: "22m ago" },
+      { id: "cl3", name: "Mike Thorne", type: "video", missed: false, duration: "8m 42s", when: "1h ago" },
+      { id: "cl4", name: "NG Forex Group", type: "voice", missed: false, duration: "24m", when: "3h ago" },
     ],
+    messages: [
+      { id: "msg1", author: "Kelly", text: "Anyone watching SUI? Looking primed for a breakout.", when: "3m", unread: true },
+      { id: "msg2", author: "Spot Traders", text: "New trade alert posted in the group — BTC long signal.", when: "18m", unread: true },
+      { id: "msg3", author: "Lola (Admin)", text: "Welcome to NG Forex! Post your setups here.", when: "1h" },
+    ],
+    notifications: [],
   },
   {
     id: "vivid",
     name: "Vivid AI",
-    tagline: "AI-driven trade signals",
+    tagline: "Ask anything · Research · Insights",
     href: "/vivid",
     accent: "#FFCC2D",
     icon: Sparkles,
-    primaryLabel: "Signals today",
-    primaryValue: "18 signals",
-    status: { label: "84% win rate", tone: "positive" },
-    notifications: [
-      { id: "v1", text: "New BTC long signal", meta: "Confidence 92%", tone: "positive", when: "just now" },
-      { id: "v2", text: "Bot \"Momentum-3\" rebalanced", meta: "+1.2% today", tone: "positive", when: "32m ago" },
-      { id: "v3", text: "ETH short closed", meta: "+1.8% realized", tone: "positive", when: "2h ago" },
+    primaryLabel: "Conversations",
+    primaryValue: "5 sessions",
+    status: { label: "3 active today", tone: "positive" },
+    conversations: [
+      {
+        id: "ai1",
+        title: "Is BTC decoupling from macro in 2025?",
+        preview: "Yes — the correlation with US equities has dropped sharply since Q1…",
+        when: "just now",
+        active: true,
+      },
+      {
+        id: "ai2",
+        title: "Review my EUR/USD swing trade setup",
+        preview: "Your entry looks solid, but the stop is too tight given the current ATR…",
+        when: "2h",
+      },
+      {
+        id: "ai3",
+        title: "What is the carry trade and how does it work?",
+        preview: "The carry trade is borrowing in a low-yield currency and investing in a higher-yield one…",
+        when: "yesterday",
+      },
+      {
+        id: "ai4",
+        title: "Best time zones to trade gold this week?",
+        preview: "Watch the London open and Tuesday's US CPI — gold tends to spike on…",
+        when: "2d",
+      },
+      {
+        id: "ai5",
+        title: "Explain order blocks and how to mark them",
+        preview: "An order block is the last opposing candle before a strong impulse move…",
+        when: "3d",
+        fromUser: true,
+      },
     ],
+    notifications: [],
   },
   {
     id: "vision",
     name: "Worldstreet Vision",
-    tagline: "Live streams & analyst rooms",
+    tagline: "Trading films · Documentaries · Series",
     href: "https://vision.worldstreetgold.com",
     external: true,
     accent: "#FFCC2D",
     icon: Tv,
-    primaryLabel: "Watching now",
-    primaryValue: "2 live rooms",
-    status: { label: "1.2K viewers live", tone: "positive" },
+    primaryLabel: "Continue watching",
+    primaryValue: "3 saved",
+    status: { label: "6 new titles added", tone: "positive" },
     videos: [
-      { id: "vi1", title: "Macro Outlook: May 2026", host: "Sarah Chen", duration: "Live", live: true, viewers: "412", thumbnail: T.vision1 },
-      { id: "vi2", title: "Crypto Weekly Recap", host: "Alex Muro", duration: "24m", thumbnail: T.vision2 },
-      { id: "vi3", title: "Forex Fundamentals", host: "James Obi", duration: "38m", thumbnail: T.vision3 },
-      { id: "vi4", title: "Macro Deep Dive: Fed", host: "Priya R.", duration: "52m", thumbnail: T.vision4 },
+      { id: "vi1", title: "The Trading Floor", host: "Drama · 1h 42m", duration: "74%", thumbnail: T.vision1 },
+      { id: "vi2", title: "Inside the Bull Run", host: "Documentary · 58m", duration: "New", thumbnail: T.vision2 },
+      { id: "vi3", title: "Forex: The Last Frontier", host: "Series · S1 E3", duration: "New", thumbnail: T.vision3 },
+      { id: "vi4", title: "Market Makers", host: "Documentary · 1h 12m", duration: "New", thumbnail: T.vision4 },
     ],
-    notifications: [
-      { id: "vn1", text: "Sarah Chen went live", meta: "Macro outlook · 412 watching", tone: "info", when: "now" },
-      { id: "vn2", text: "Replay ready: Crypto recap", meta: "24m · Posted today", tone: "neutral", when: "1h ago" },
-      { id: "vn3", text: "New follower: @market_mike", meta: "+12 this week", tone: "positive", when: "3h ago" },
-    ],
+    notifications: [],
   },
   {
     id: "xtreme",
@@ -237,11 +312,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
       { id: "x3", title: "NY Futures Pit", host: "Carlos R.", duration: "Live", live: true, viewers: "612", thumbnail: T.xtreme3 },
       { id: "x4", title: "Asia Crypto Late", host: "Yuki T.", duration: "Live", live: true, viewers: "318", thumbnail: T.xtreme4 },
     ],
-    notifications: [
-      { id: "xn1", text: "Mike Thorne is scalping live", meta: "BTC floor · 1.2K watching", tone: "info", when: "now" },
-      { id: "xn2", text: "London Open started", meta: "Forex room", tone: "info", when: "12m ago" },
-      { id: "xn3", text: "You earned +$84 from copy", meta: "Carlos R. floor", tone: "positive", when: "1h ago" },
-    ],
+    notifications: [],
   },
   {
     id: "academy",
@@ -260,11 +331,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
       { id: "co3", title: "Crypto Markets 101", lessons: "16 lessons", progress: 100, thumbnail: T.course3 },
       { id: "co4", title: "Advanced Forex", lessons: "20 lessons", progress: 14, thumbnail: T.course4 },
     ],
-    notifications: [
-      { id: "a1", text: "Lesson unlocked: Risk Mgmt 04", meta: "Trading Foundations", tone: "info", when: "today" },
-      { id: "a2", text: "Quiz passed · 9/10", meta: "Forex Essentials", tone: "positive", when: "yesterday" },
-      { id: "a3", text: "Certificate issued", meta: "Intro to Crypto Markets", tone: "positive", when: "2d ago" },
-    ],
+    notifications: [],
   },
   {
     id: "shop",
@@ -284,11 +351,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
       { id: "s3", name: "WS Cap — Black", price: "$32.00", category: "Apparel", thumbnail: T.shop3 },
       { id: "s4", name: "Desk Mat XL", price: "$44.00", category: "Accessories", thumbnail: T.shop4 },
     ],
-    notifications: [
-      { id: "sh1", text: "New order #4821", meta: "$240 · Shipped", tone: "positive", when: "12m ago" },
-      { id: "sh2", text: "Listing approved", meta: "Cold-pressed Olive Oil", tone: "info", when: "1h ago" },
-      { id: "sh3", text: "Refund issued #4810", meta: "-$42", tone: "negative", when: "4h ago" },
-    ],
+    notifications: [],
   },
   {
     id: "social",
@@ -307,28 +370,6 @@ export const welcomePlatforms: WelcomePlatform[] = [
       { id: "p2", author: "Sarah Chen", handle: "@sarahc", text: "Macro recap from this morning is up. Fed in focus this week.", likes: "184", when: "1h" },
       { id: "p3", author: "Mike Thorne", handle: "@mscalp", text: "Live floor open — running BTC scalps for the next hour.", likes: "92", when: "2h" },
     ],
-    notifications: [
-      { id: "sn1", text: "@trader_jay replied to your post", meta: "BTC weekly outlook", tone: "info", when: "5m ago" },
-      { id: "sn2", text: "Your post is trending", meta: "1.2K reactions today", tone: "positive", when: "1h ago" },
-      { id: "sn3", text: "12 new followers", meta: "This week", tone: "positive", when: "today" },
-    ],
-  },
-  {
-    id: "community",
-    name: "Community",
-    tagline: "Groups, rooms & member chat",
-    href: "https://community.worldstreetgold.com",
-    external: true,
-    spotOnly: true,
-    accent: "#FFCC2D",
-    icon: Users,
-    primaryLabel: "Active groups",
-    primaryValue: "12 groups",
-    status: { label: "+128 members today", tone: "positive" },
-    notifications: [
-      { id: "cm1", text: "New message in Spot Traders", meta: "@kelly: anyone watching SUI?", tone: "info", when: "3m ago" },
-      { id: "cm2", text: "You were added to NG Forex", meta: "By admin @lola", tone: "positive", when: "1h ago" },
-      { id: "cm3", text: "Group event tomorrow", meta: "Macro AMA · 7pm GMT", tone: "neutral", when: "today" },
-    ],
+    notifications: [],
   },
 ];
