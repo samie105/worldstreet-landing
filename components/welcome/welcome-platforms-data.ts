@@ -79,6 +79,7 @@ export type WelcomePlatform = {
   href: string;
   external?: boolean;
   comingSoon?: boolean;
+  spotOnly?: boolean; // hide content + zero metrics on crypto/forex tabs
   accent: string;
   icon: LucideIcon;
   primaryLabel: string;
@@ -271,6 +272,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     tagline: "Storefronts · Orders · Listings",
     href: "https://shop.worldstreetgold.com",
     external: true,
+    spotOnly: true,
     accent: "#FFCC2D",
     icon: ShoppingBag,
     primaryLabel: "Sales (30d)",
@@ -294,6 +296,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     tagline: "Posts, signals & creator feed",
     href: "https://social.worldstreetgold.com",
     external: true,
+    spotOnly: true,
     accent: "#FFCC2D",
     icon: MessageCircle,
     primaryLabel: "Engagement",
@@ -316,6 +319,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     tagline: "Groups, rooms & member chat",
     href: "https://community.worldstreetgold.com",
     external: true,
+    spotOnly: true,
     accent: "#FFCC2D",
     icon: Users,
     primaryLabel: "Active groups",

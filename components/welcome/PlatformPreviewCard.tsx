@@ -27,6 +27,9 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
   const sparkline = tradingData?.sparkline ?? platform.sparkline;
   const history = tradingData?.history ?? platform.history;
 
+  // Spot-only platforms (Shop, Social, Community) show zero state on crypto/forex tabs
+  const isZeroed = !!platform.spotOnly && assetClass !== "fiat";
+
   // Initial entrance stagger
   useEffect(() => {
     if (!cardRef.current) return;
@@ -154,17 +157,17 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
           )}
         </div>
         <div className="flex items-end gap-3">
-          <div className="text-[24px] font-medium text-white tabular-nums tracking-tight leading-none">
-            {primaryValue}
+          <div className={`text-[24px] font-medium tabular-nums tracking-tight leading-none ${isZeroed ? "text-gray-700" : "text-white"}`}>
+            {isZeroed ? "—" : primaryValue}
           </div>
           <span
             className={`mb-0.5 inline-flex items-center gap-0.5 text-[11px] font-medium ${
-              positive ? "text-emerald-400" : negative ? "text-rose-400" : "text-gray-400"
+              isZeroed ? "text-gray-700" : positive ? "text-emerald-400" : negative ? "text-rose-400" : "text-gray-400"
             }`}
           >
-            {positive && <ArrowUpRight className="w-3 h-3" />}
-            {negative && <ArrowDownRight className="w-3 h-3" />}
-            {status.label}
+            {!isZeroed && positive && <ArrowUpRight className="w-3 h-3" />}
+            {!isZeroed && negative && <ArrowDownRight className="w-3 h-3" />}
+            {isZeroed ? "Spot only" : status.label}
           </span>
         </div>
       </div>
@@ -217,7 +220,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
         )}
 
         {/* Vision / Xtreme: horizontal video carousel with fade mask */}
-        {platform.videos && (
+        {!isZeroed && platform.videos && (
           <div className="relative pb-5">
             <div className="overflow-x-auto scrollbar-hide px-6">
               <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
@@ -261,7 +264,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
         )}
 
         {/* Academy: horizontal course carousel */}
-        {platform.courses && (
+        {!isZeroed && platform.courses && (
           <div className="relative pb-5">
             <div className="overflow-x-auto scrollbar-hide px-6">
               <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
@@ -294,7 +297,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
         )}
 
         {/* Shop: horizontal product carousel */}
-        {platform.shopItems && (
+        {!isZeroed && platform.shopItems && (
           <div className="relative pb-5">
             <div className="overflow-x-auto scrollbar-hide px-6">
               <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
@@ -325,7 +328,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
         )}
 
         {/* Social: post feed */}
-        {platform.posts && (
+        {!isZeroed && platform.posts && (
           <div className="px-6 pb-5">
             <div className="border border-white/[0.06]">
               {platform.posts.map((p) => (
@@ -349,7 +352,8 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
         )}
 
         {/* Plain platforms (Vivid AI, Community): clean stat tiles */}
-        {!platform.byAsset &&
+        {!isZeroed &&
+          !platform.byAsset &&
           !platform.videos &&
           !platform.courses &&
           !platform.shopItems &&
@@ -364,6 +368,12 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
               ))}
             </div>
           )}
+        {/* Spot-only empty state */}
+        {isZeroed && (
+          <div className="flex-1 flex items-center justify-center px-6 py-10">
+            <span className="text-[10px] uppercase tracking-widest text-gray-700 font-body">Available in Spot mode</span>
+          </div>
+        )}
       </div>
 
       {/* CTA */}

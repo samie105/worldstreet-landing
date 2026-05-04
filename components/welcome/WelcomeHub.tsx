@@ -91,6 +91,7 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
     return () => ctx.revert();
   }, [assetClass]);
 
+
   return (
     <div className="min-h-screen flex flex-col bg-[#050505] text-white">
       {/* ── Top bar ───────────────────────────────────────────── */}
@@ -211,7 +212,37 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
             </span>
           </div>
 
-          {/* Re-mount entire panel on asset-class switch for dramatic re-stagger */}
+          {/* ── Platform quick-nav grid ── */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 border-t border-l border-white/[0.08] mb-10">
+            {welcomePlatforms.map((p) => {
+              const PIcon = p.icon;
+              const inner = (
+                <>
+                  <div className="w-10 h-10 rounded-md bg-white/[0.04] flex items-center justify-center mb-2.5 group-hover:bg-[#FFCC2D]/[0.06] transition-colors">
+                    <PIcon className="w-5 h-5 text-gray-400 group-hover:text-[#FFCC2D] transition-colors" strokeWidth={1.5} />
+                  </div>
+                  <span className="text-[11px] font-medium text-gray-400 group-hover:text-white transition-colors text-center leading-snug">
+                    {p.name.replace("Worldstreet ", "")}
+                  </span>
+                  {p.comingSoon && (
+                    <span className="mt-1 text-[8px] uppercase tracking-widest text-gray-600">Soon</span>
+                  )}
+                </>
+              );
+              const cls = "group flex flex-col items-center justify-center py-5 px-3 border-r border-b border-white/[0.08] hover:bg-white/[0.03] transition-colors";
+              return p.external ? (
+                <a key={p.id} href={p.href} target="_blank" rel="noopener noreferrer" className={cls}>
+                  {inner}
+                </a>
+              ) : (
+                <Link key={p.id} href={p.href} className={cls}>
+                  {inner}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* ── Detailed platform cards (scroll for more detail) ── */}
           <div
             key={assetClass}
             ref={panelRef}
