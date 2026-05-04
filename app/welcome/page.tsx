@@ -1,21 +1,17 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { currentUser } from "@clerk/nextjs/server";
 import WelcomeHub from "../../components/welcome/WelcomeHub";
 
 export default async function WelcomePage() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    redirect("/login");
-  }
-
   const user = await currentUser();
+
+  const firstName = user?.firstName ?? "John";
+  const lastName = user?.lastName ?? "Doe";
 
   return (
     <WelcomeHub
-      firstName={user?.firstName ?? ""}
-      lastName={user?.lastName ?? ""}
-      initials={`${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`}
+      firstName={firstName}
+      lastName={lastName}
+      initials={`${firstName[0]}${lastName[0]}`}
       imageUrl={user?.imageUrl}
     />
   );

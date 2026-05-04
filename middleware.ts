@@ -3,15 +3,9 @@ import { NextResponse } from "next/server";
 
 const WELCOME_URL = "/welcome";
 const isAuthRoute = createRouteMatcher(["/login", "/register"]);
-const isProtectedRoute = createRouteMatcher(["/welcome"]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
-
-  // Redirect unauthenticated users away from protected routes to local /login
-  if (!userId && isProtectedRoute(req)) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
 
   // Redirect signed-in users away from auth pages to the welcome hub
   if (userId && isAuthRoute(req)) {
