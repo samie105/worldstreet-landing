@@ -107,13 +107,13 @@ function CryptoBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | n
         </div>
       </div>
 
-      <div className="grid grid-cols-3 border-t border-white/[0.08]">
-        <div className="px-4 py-4 border-r border-white/[0.08]">
+      <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-white/[0.08]">
+        <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="flex items-center gap-1.5 mb-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /><span className="text-[10px] uppercase tracking-widest text-gray-500">Today&apos;s P&amp;L</span></div>
           <div className="text-[18px] md:text-xl font-medium text-emerald-400 tabular-nums">+$2,340.18</div>
           <div className="text-[10px] text-gray-500 mt-0.5">+0.82% · 24h</div>
         </div>
-        <div className="px-4 py-4 border-r border-white/[0.08]">
+        <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Active Assets</div>
           <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">14</div>
           <div className="text-[10px] text-gray-500 mt-0.5">Across 6 networks</div>
@@ -153,11 +153,11 @@ function ForexBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | nu
         <div>
           <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">All accounts</div>
           <span ref={balRef} className="block text-4xl md:text-5xl lg:text-6xl font-medium text-white tabular-nums tracking-tight">$0.00</span>
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
             <span className="text-[11px] text-gray-500">Margin used: <span className="text-white">$4,820</span></span>
-            <span className="text-[10px] text-gray-700">·</span>
+            <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
             <span className="text-[11px] text-gray-500">Free margin: <span className="text-emerald-400">$81,600</span></span>
-            <span className="text-[10px] text-gray-700">·</span>
+            <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
             <span className="text-[11px] text-gray-500">Leverage: <span className="text-white">1:100</span></span>
           </div>
         </div>
@@ -168,17 +168,17 @@ function ForexBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | nu
         </div>
       </div>
 
-      <div className="grid grid-cols-3 border-t border-white/[0.08]">
-        <div className="px-4 py-4 border-r border-white/[0.08]">
+      <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-white/[0.08]">
+        <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="flex items-center gap-1.5 mb-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /><span className="text-[10px] uppercase tracking-widest text-gray-500">Floating P&amp;L</span></div>
           <div className="text-[18px] md:text-xl font-medium text-emerald-400 tabular-nums">+$456.00</div>
           <div className="text-[10px] text-gray-500 mt-0.5">3 open positions</div>
         </div>
-        <div className="px-4 py-4 border-r border-white/[0.08]">
+        <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Open Trades</div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
             {OPEN_POSITIONS.map((p) => (
-              <div key={p.pair} className="flex flex-col">
+              <div key={p.pair} className="flex items-center gap-1.5">
                 <span className="text-[11px] text-white font-medium">{p.pair}</span>
                 <span className={`text-[10px] font-medium ${p.pos ? "text-emerald-400" : "text-rose-400"}`}>{p.pnl}</span>
               </div>

@@ -151,7 +151,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
       {/* Body */}
       <div className="flex-1 flex flex-col">
         {/* Trading: chart + history */}
-        {platform.byAsset && sparkline && (
+        {sparkline && (
           <>
             <div className="px-6 pb-3 opacity-80">
               <Sparkline data={sparkline} accent="#FFCC2D" height={48} animateKey={`${platform.id}-${assetClass}`} />
