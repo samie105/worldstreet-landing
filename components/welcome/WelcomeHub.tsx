@@ -429,10 +429,6 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
               >
                 Welcome back, <span className="text-[#FFCC2D]">{firstName}</span>
               </h1>
-              <p data-greet className="text-[14px] text-gray-400 mt-2 font-body">
-                Pick a platform to dive into. Everything from your trading desk to your stream
-                room is one click away.
-              </p>
             </div>
 
             {/* Asset-class tab switcher */}
@@ -484,6 +480,9 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
               <h2 className="text-xl md:text-2xl font-medium tracking-tight text-white">
                 Where do you want to go?
               </h2>
+              <p className="text-[13px] text-gray-500 mt-1.5 font-body">
+                Pick a platform to dive into. Everything from your trading desk to your stream room is one click away.
+              </p>
             </div>
             <span className="text-[10px] uppercase tracking-widest text-gray-500 font-body">
               {resolvedPlatforms.length} platforms
@@ -528,7 +527,7 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {resolvedPlatforms.map((platform, i) => (
-                <div key={platform.id} className="border-r border-b border-white/[0.08]">
+                <div key={platform.id} className="border-r border-b border-white/[0.08] bg-white/[0.018]">
                   <PlatformPreviewCard platform={platform} index={i} assetClass={assetClass} />
                 </div>
               ))}
