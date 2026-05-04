@@ -130,17 +130,7 @@ function CryptoBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | n
 
 // ─── FOREX ───────────────────────────────────────────────────────────────────
 
-const FOREX_VIEWS = [
-  { key: "total", label: "Total", sub: "All accounts" },
-  { key: "standard", label: "Standard", sub: "Standard account" },
-  { key: "ecn", label: "ECN", sub: "ECN account" },
-  { key: "prop", label: "Prop", sub: "Prop challenge" },
-] as const;
-type ForexView = (typeof FOREX_VIEWS)[number]["key"];
-
-const FOREX_BALANCES: Record<ForexView, number> = {
-  total: 86420.0, standard: 42140.0, ecn: 28640.0, prop: 15640.0,
-};
+const FOREX_BALANCE = 86420.0;
 
 const OPEN_POSITIONS = [
   { pair: "EUR/USD", side: "buy", size: "0.80 lot", pnl: "+$320", pos: true },
@@ -149,29 +139,19 @@ const OPEN_POSITIONS = [
 ];
 
 function ForexBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | null> }) {
-  const [view, setView] = useState<ForexView>("total");
-
   useEffect(() => {
     if (!balRef.current) return;
     const el = balRef.current;
     const obj = { v: 0 };
-    const tween = gsap.to(obj, { v: FOREX_BALANCES[view], duration: 0.9, ease: "power3.out", onUpdate: () => { el.textContent = formatUSD(obj.v); } });
+    const tween = gsap.to(obj, { v: FOREX_BALANCE, duration: 0.9, ease: "power3.out", onUpdate: () => { el.textContent = formatUSD(obj.v); } });
     return () => { tween.kill(); };
-  }, [view, balRef]);
+  }, [balRef]);
 
   return (
     <>
-      <div className="flex items-center gap-1 mb-5">
-        {FOREX_VIEWS.map((v) => (
-          <button key={v.key} onClick={() => setView(v.key)} className={`px-3 py-1.5 text-[11px] font-medium uppercase tracking-widest transition-colors ${view === v.key ? "bg-white/10 text-white" : "text-gray-500 hover:text-white hover:bg-white/[0.04]"}`}>{v.label}</button>
-        ))}
-      </div>
-
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-6">
         <div>
-          <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">
-            {FOREX_VIEWS.find((v) => v.key === view)?.sub}
-          </div>
+          <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">All accounts</div>
           <span ref={balRef} className="block text-4xl md:text-5xl lg:text-6xl font-medium text-white tabular-nums tracking-tight">$0.00</span>
           <div className="mt-3 flex items-center gap-3">
             <span className="text-[11px] text-gray-500">Margin used: <span className="text-white">$4,820</span></span>
@@ -219,9 +199,7 @@ function ForexBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | nu
 
 const FIAT_ACCOUNTS = [
   { key: "usd", label: "USD", flag: "🇺🇸", balance: 28410.0, iban: "WS · **** 4821" },
-  { key: "gbp", label: "GBP", flag: "🇬🇧", balance: 8200.0, iban: "WS · **** 7743" },
-  { key: "eur", label: "EUR", flag: "🇪🇺", balance: 6300.0, iban: "WS · **** 3312" },
-  { key: "ngn", label: "NGN", flag: "🇳🇬", balance: 5300.0, iban: "WS · **** 9904" },
+  { key: "ngn", label: "NGN", flag: "🇳🇬", balance: 19800.0, iban: "WS · **** 9904" },
 ];
 
 const FIAT_RATES = [
@@ -287,7 +265,7 @@ function FiatBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | nul
         <div className="px-4 py-4 border-r border-white/[0.08]">
           <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Total (All Currencies)</div>
           <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">$48,210</div>
-          <div className="text-[10px] text-gray-500 mt-0.5">4 currencies held</div>
+          <div className="text-[10px] text-gray-500 mt-0.5">2 currencies held</div>
         </div>
         <div className="px-4 py-4">
           <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Last Transfer</div>
