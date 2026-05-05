@@ -636,3 +636,106 @@ in WelcomeHub. I need to pass it into the card component so the header inner con
 - `20:40:56` 🤖 **ai**: The cards are rendering with the new tinted header containers. I can see the Forex Trading card at the bottom with its header container. Let me scroll down to see more cards:
 - `20:42:56` 🤖 **ai**: The card headers look great — the Forex Trading card now has the tinted rounded header container with the icon, name, tagline, and arrow all grouped together. Now let me commit and push:
 - `20:43:56` 🤖 **ai**: Committed and pushed (`91dc858`). The card headers now each sit in their own slightly-rounded tinted container using the card's `cardColor`, grouping the icon, name, tagline, and arrow link together a
+- `14:01:09` 💬 **user**: why didn't you use the worldstreet links why am i seeing /trading
+- `14:02:11` 🤖 **ai**: **Investigating platform links**
+
+I need to inspect the PlatformPreviewCard to see if it uses the external attribute on platform.external. It might support an external link. There's also a mention of 
+- `14:03:10` 🤖 **ai**: **Considering user expectations**
+
+The user seems to expect a fix, not just an explanation. Since they asked "why," it implies they want corrections related to the worldstreet links. I should probably
+- `14:03:16` 🤖 **ai**: **Inspecting ActionBtn support**
+
+I need to look into whether the ActionBtn can support external links, as it seems to currently always utilize Link. I’m thinking it’s important to clarify its functio
+- `14:04:00` saved `components/welcome/BalanceHero.tsx`
+- `14:04:00` saved `components/welcome/welcome-platforms-data.ts`
+- `14:04:10` 🤖 **ai**: The hero button already uses plain anchors, so I only need the destination. The only trading-specific Worldstreet URL already present in the project history is `https://dashboard.worldstreetgold.com/`
+- `14:05:10` 🤖 **ai**: The code is clean for this change; the only reported issues are pre-existing Tailwind shorthand suggestions. I’m doing one last exact search in the welcome folder because the earlier glob was too loos
+- `14:06:10` 🤖 **ai**: The repo memory is empty, so I’m adding a single note with the verified trading-link convention and nothing else.
+**Validating Changes in Code**
+
+I'm thinking about mentioning validation: the touched 
+- `14:45:49` saved `components/welcome/welcome-platforms-data.ts`
+- `14:45:49` saved `components/welcome/BalanceHero.tsx`
+- `14:48:09` 💬 **user**: go to the academy folder in the desktop spot worldstreet academy, you'll see the links to the different external links, an example is academy.worldstr
+- `14:48:36` 🤖 **ai**: **Clarifying tool usage**
+
+I need to check if I should respond with commentary before using the tools. It seems like the function we need isn't actually available, based on the developer instructions.
+- `14:57:18` 💬 **user**: go to the academy folder in the desktop spot worldstreet academy, you'll see the links to the different external links, an example is academy.worldstr
+- `14:58:19` 🤖 **ai**: I’ve confirmed the current project already uses subdomain-style links, and only the dashboard targets were ambiguous. Next I’m mining the academy and dashboard-revamp repos for their actual canonical 
+- `14:58:53` saved `components/welcome/welcome-platforms-data.ts`
+- `14:58:53` saved `components/welcome/BalanceHero.tsx`
+- `14:59:19` 🤖 **ai**: **Considering URL updates**
+
+I'm piecing together details about the academy and how it relates to the Crypto Dashboard and Forex Trading. It looks like the landing page should have distinct URLs for F
+- `15:00:19` 🤖 **ai**: **Updating the to-do list**
+
+I think I need to update my to-do list to mark everything as complete. It might be worth inspecting other links to see if there’s anything else to check. I wonder if furth
+- `15:24:18` 💬 **user**: trading goes to dashboard.worldstreet.com, academy goes to academy**, vision**, xtreme**, shop. the communitiy doesn't link anywhere, the social media
+- `15:25:13` 🤖 **ai**: **Deciding on link usage**
+
+I need to clarify whether the current component should render a link for the user, who doesn’t seem to want any links. There are some past patterns showing that when they r
+- `15:25:18` saved `components/welcome/welcome-platforms-data.ts`
+- `15:25:18` saved `components/welcome/BalanceHero.tsx`
+- `15:25:26` 🤖 **ai**: I’m doing one quick domain check before editing so I don’t bake in the wrong host if there’s already a live `worldstreet.com` pattern somewhere in the Spot
+- `15:26:20` 🤖 **ai**: I’m doing one quick domain check before editing so I don’t bake in the wrong host if there’s already a live `worldstreet.com` pattern somewhere in the Spot repos.
+**Planning platform edits**
+
+I’m noti
+- `15:26:35` saved `components/welcome/WelcomeHub.tsx`
+- `15:26:35` saved `components/welcome/PlatformPreviewCard.tsx`
+- `15:26:35` saved `components/welcome/welcome-platforms-data.ts`
+- `15:27:12` saved `components/welcome/BalanceHero.tsx`
+- `15:27:20` 🤖 **ai**: ```
+```
+
+```
+```
+
+```
+```
+**Seeking validation on edits**
+
+I need to validate my first substantive edit. I should check for errors in the files I modified and maybe look into resources like community.
+- `15:27:32` saved `components/welcome/welcome-platforms-data.ts`
+- `15:27:32` saved `components/welcome/PlatformPreviewCard.tsx`
+- `15:27:32` saved `components/welcome/BalanceHero.tsx`
+- `15:27:32` saved `components/welcome/WelcomeHub.tsx`
+- `15:28:20` 🤖 **ai**: The link checks are clean now: the welcome surface only has the requested Worldstreet destinations, and the community URL is gone. I’m syncing the small repo note so future edits keep this exact mappi
+- `15:29:20` 🤖 **ai**: I updated the welcome dashboard mapping in
+,
+,
+, and
+. Both trading cards and the New Trade action now go to https://dashboard.worldstreetgold.com. Academy, Vision, Xtreme, Shop, and Social stay on th
+- `15:31:19` 💬 **user**: Build Error
+
+
+
+Parsing ecmascript source code failed
+./components/welcome/PlatformPreviewCard.tsx (127:12)
+
+Parsing ecmascript source code failed
+  12
+- `15:31:24` saved `components/welcome/PlatformPreviewCard.tsx`
+- `15:32:03` saved `components/welcome/PlatformPreviewCard.tsx`
+- `15:32:20` 🤖 **ai**: **Validating edits**
+
+After making my initial edit, the next step is to validate it. I'm considering adding `: null` for clarity, and possibly using an explicit null branch. If `get_errors` reveals an
+- `15:32:25` saved `components/welcome/PlatformPreviewCard.tsx`
+- `15:32:25` saved `components/welcome/WelcomeHub.tsx`
+- `15:33:20` 🤖 **ai**: ```
+```
+
+```
+```
+I’ve repaired the type-narrowing issue in the same slice. I’m rerunning the production build now to confirm the welcome route compiles all the way through.
+**Clarifying formatting for
+- `15:35:07` saved `components/welcome/WelcomeHub.tsx`
+- `15:35:07` saved `components/welcome/PlatformPreviewCard.tsx`
+- `15:35:41` 💬 **user**: for the forex use portal**
+- `15:36:33` saved `components/welcome/BalanceHero.tsx`
+- `15:36:33` saved `components/welcome/welcome-platforms-data.ts`
+- `15:37:20` 🤖 **ai**: The user is requesting that Forex Trading should use the portal subdomain instead of dashboard. Based on the conversation summary, I need to:
+
+1. Update `components/welcome/welcome-platforms-data.ts` 
+- `15:37:34` saved `components/welcome/welcome-platforms-data.ts`
+- `15:37:34` saved `components/welcome/BalanceHero.tsx`

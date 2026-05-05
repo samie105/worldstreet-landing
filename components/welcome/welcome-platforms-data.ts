@@ -102,7 +102,7 @@ export type WelcomePlatform = {
   id: string;
   name: string;
   tagline: string;
-  href: string;
+  href?: string;
   external?: boolean;
   comingSoon?: boolean;
   spotOnly?: boolean; // hide content + zero metrics on crypto/forex tabs
@@ -196,7 +196,8 @@ export const welcomePlatforms: WelcomePlatform[] = [
     id: "forex-trading",
     name: "Forex Trading",
     tagline: "Spot · Futures · P2P",
-    href: "/trading",
+    href: "https://portal.worldstreetgold.com",
+    external: true,
     accent: "#FFCC2D",
     icon: LineChart,
     primaryLabel: "Open P&L",
@@ -211,7 +212,8 @@ export const welcomePlatforms: WelcomePlatform[] = [
     id: "crypto-trading",
     name: "Crypto Trading",
     tagline: "Spot · Futures · Perps · DeFi",
-    href: "/trading",
+    href: "https://dashboard.worldstreetgold.com",
+    external: true,
     accent: "#FFCC2D",
     icon: LineChart,
     primaryLabel: "Open P&L",
@@ -226,8 +228,6 @@ export const welcomePlatforms: WelcomePlatform[] = [
     id: "community",
     name: "Community",
     tagline: "Calls · Messages · Groups",
-    href: "https://community.worldstreetgold.com",
-    external: true,
     accent: "#FFCC2D",
     icon: Users,
     primaryLabel: "Unread",

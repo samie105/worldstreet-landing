@@ -378,14 +378,9 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
                     <span className="text-[10px] text-gray-600 uppercase tracking-widest">
                       {CONTACTS.filter((c) => c.online).length} contacts online
                     </span>
-                    <a
-                      href="https://community.worldstreetgold.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] text-[#FFCC2D] hover:underline uppercase tracking-widest"
-                    >
-                      Open Community ↗
-                    </a>
+                    <span className="text-[10px] text-gray-600 uppercase tracking-widest">
+                      Community lives here
+                    </span>
                   </div>
                 </div>
               )}
@@ -487,6 +482,7 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
           <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 border-t border-l border-white/[0.08] mb-10">
             {welcomePlatforms.map((p) => {
               const PIcon = p.icon;
+              const hasLink = Boolean(p.href);
               const inner = (
                 <>
                   <div className="w-10 h-10 rounded-md bg-white/[0.04] flex items-center justify-center mb-2.5 group-hover:bg-[#FFCC2D]/[0.06] transition-colors">
@@ -500,15 +496,19 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
                   )}
                 </>
               );
-              const cls = "group flex flex-col items-center justify-center py-5 px-3 border-r border-b border-white/[0.08] hover:bg-white/[0.03] transition-colors";
-              return p.external ? (
+              const cls = `group flex flex-col items-center justify-center py-5 px-3 border-r border-b border-white/[0.08] transition-colors ${hasLink ? "hover:bg-white/[0.03]" : ""}`;
+              return hasLink && p.external ? (
                 <a key={p.id} href={p.href} target="_blank" rel="noopener noreferrer" className={cls}>
                   {inner}
                 </a>
-              ) : (
-                <Link key={p.id} href={p.href} className={cls}>
+              ) : hasLink ? (
+                <Link key={p.id} href={p.href!} className={cls}>
                   {inner}
                 </Link>
+              ) : (
+                <div key={p.id} className={cls}>
+                  {inner}
+                </div>
               );
             })}
           </div>

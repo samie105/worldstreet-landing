@@ -18,6 +18,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
   const cardRef = useRef<HTMLDivElement>(null);
   const dynamicRef = useRef<HTMLDivElement>(null);
   const Icon = platform.icon;
+  const hasLink = Boolean(platform.href);
 
   // For Trading: pick per-asset-class data when available
   const tradingData = platform.byAsset?.[assetClass];
@@ -103,7 +104,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
             </span>
           )}
           {/* Arrow — always on mobile, hover on desktop */}
-          {platform.external ? (
+          {hasLink && platform.external ? (
             <a
               href={platform.href}
               target="_blank"
@@ -114,16 +115,16 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
             >
               <ArrowUpRight className="w-4 h-4" />
             </a>
-          ) : (
+          ) : hasLink ? (
             <Link
-              href={platform.href}
+              href={platform.href!}
               className="w-7 h-7 flex items-center justify-center text-[#FFCC2D] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
               aria-label={`Open ${platform.name}`}
               onClick={(e) => e.stopPropagation()}
             >
               <ArrowUpRight className="w-4 h-4" />
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -469,7 +470,7 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
       </div>
 
       {/* CTA */}
-      {platform.external ? (
+      {hasLink && platform.external ? (
         <a
           href={platform.href}
           target="_blank"
@@ -479,13 +480,18 @@ export default function PlatformPreviewCard({ platform, index, assetClass }: Pro
           {cta}
           <span className="text-[9px] uppercase tracking-widest text-gray-600">External ↗</span>
         </a>
-      ) : (
+      ) : hasLink ? (
         <Link
-          href={platform.href}
+          href={platform.href!}
           className="flex mx-6 mb-6 mt-2 pt-4 border-t border-white/[0.06] items-center justify-between group/cta"
         >
           {cta}
         </Link>
+      ) : (
+        <div className="flex mx-6 mb-6 mt-2 pt-4 border-t border-white/[0.06] items-center justify-between">
+          <span className="text-[12px] font-medium text-gray-500">Available in this hub</span>
+          <span className="text-[9px] uppercase tracking-widest text-gray-600">No external link</span>
+        </div>
       )}
     </div>
   );

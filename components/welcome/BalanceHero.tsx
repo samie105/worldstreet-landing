@@ -162,7 +162,7 @@ function ForexBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | nu
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ActionBtn href="/trading/forex" icon={TrendingUp} label="New Trade" primary />
+          <ActionBtn href="https://portal.worldstreetgold.com" icon={TrendingUp} label="New Trade" primary />
           <ActionBtn href="/deposit" icon={ArrowDownToLine} label="Fund" />
           <ActionBtn href="/withdraw" icon={ArrowUpFromLine} label="Withdraw" />
         </div>
