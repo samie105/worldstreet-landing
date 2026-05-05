@@ -1,15 +1,15 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const DASHBOARD_URL = process.env.NEXT_PUBLIC_DASHBOARD_URL ?? "https://dashboard.worldstreetgold.com/";
+const WELCOME_URL = "/welcome";
 const isAuthRoute = createRouteMatcher(["/login", "/register"]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
-  // Redirect signed-in users away from auth pages to the dashboard
+  // Redirect signed-in users away from auth pages to the welcome hub
   if (userId && isAuthRoute(req)) {
-    return NextResponse.redirect(DASHBOARD_URL);
+    return NextResponse.redirect(new URL(WELCOME_URL, req.url));
   }
 });
 

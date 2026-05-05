@@ -25,6 +25,10 @@ export default function RootLayout({
       telemetry={false}
       domain="worldstreetgold.com"
       isSatellite={false}
+      signInUrl="/login"
+      signUpUrl="/register"
+      signInFallbackRedirectUrl="/welcome"
+      signUpFallbackRedirectUrl="/welcome"
     >
       <html lang="en" className="dark">
         <body className={`${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>

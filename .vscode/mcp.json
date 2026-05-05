@@ -1,9 +1,0 @@
-{
-  "servers": {
-    "remb": {
-      "type": "stdio",
-      "command": "remb",
-      "args": ["serve"]
-    }
-  }
-}
