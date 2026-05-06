@@ -26,6 +26,7 @@ import {
   answerCall,
   endCall as endCallAction,
   getCallStatus,
+  fetchMyCallToken,
 } from "@/lib/community/actions/calls"
 import { useCallEvents } from "@/lib/community/use-events"
 import { useProfile } from "@/components/profile-provider"
@@ -261,18 +262,13 @@ export function VideoCall({
           const currentCallId2 = callIdRef.current
           if (!currentCallId2 || event.callId !== currentCallId2) return
 
-          if (!isIncoming) {
-            const callerToken = event.status
-            if (callerToken) {
-              authTokenRef.current = callerToken
-              rtkClient.init(callerToken, {
+          if (event.authToken) {
+            authTokenRef.current = event.authToken
+            if (!isIncoming) {
+              rtkClient.init(event.authToken, {
                 audio: true,
                 video: callType === "video",
               }).catch(() => {})
-            }
-          } else {
-            if (event.authToken) {
-              authTokenRef.current = event.authToken
             }
           }
           break
@@ -281,28 +277,38 @@ export function VideoCall({
         case "call:answered": {
           if (!isIncoming && !hasJoinedRoomRef.current) {
             setCallState("connecting")
-            const token = authTokenRef.current
-            if (token) {
-              ;(async () => {
-                try {
-                  if (!rtkClient.client) {
-                    await rtkClient.init(token, {
-                      audio: true,
-                      video: callType === "video",
-                    })
+            ;(async () => {
+              // If we don't have a token yet (tokens-ready was missed), fetch from server
+              let token = authTokenRef.current
+              if (!token) {
+                const currentCallId3 = callIdRef.current
+                if (currentCallId3) {
+                  const result = await fetchMyCallToken(currentCallId3)
+                  if (result.success && result.authToken) {
+                    authTokenRef.current = result.authToken
+                    token = result.authToken
                   }
-                  await rtkClient.joinRoom()
-                  hasJoinedRoomRef.current = true
-                  try { await rtkClient.client?.self.enableAudio() } catch {}
-                  if (callType === "video") {
-                    try { await rtkClient.client?.self.enableVideo() } catch {}
-                  }
-                } catch (err) {
-                  console.error("[Caller] RTK init/join failed:", err)
-                  setCallState("ended")
                 }
-              })()
-            }
+              }
+              if (!token) return
+              try {
+                if (!rtkClient.client) {
+                  await rtkClient.init(token, {
+                    audio: true,
+                    video: callType === "video",
+                  })
+                }
+                await rtkClient.joinRoom()
+                hasJoinedRoomRef.current = true
+                try { await rtkClient.client?.self.enableAudio() } catch {}
+                if (callType === "video") {
+                  try { await rtkClient.client?.self.enableVideo() } catch {}
+                }
+              } catch (err) {
+                console.error("[Caller] RTK init/join failed:", err)
+                setCallState("ended")
+              }
+            })()
           }
           break
         }
@@ -723,7 +729,15 @@ export function VideoCall({
 
     callSounds.resume()
 
-    const token = incomingAuthToken || authTokenRef.current
+    // Wait up to 8s for tokens-ready if token not yet available
+    let token = incomingAuthToken || authTokenRef.current
+    if (!token) {
+      const deadline = Date.now() + 8000
+      while (!authTokenRef.current && Date.now() < deadline) {
+        await new Promise<void>((r) => setTimeout(r, 250))
+      }
+      token = authTokenRef.current
+    }
 
     if (token) {
       authTokenRef.current = token

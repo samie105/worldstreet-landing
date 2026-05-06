@@ -2,6 +2,7 @@
 
 import { connectDB } from "@/lib/mongodb"
 import { getAuthUser } from "@/lib/auth"
+import { clerkClient } from "@clerk/nextjs/server"
 import Call, { type ICall, type CallType } from "@/models/Call"
 import CommunityConversation from "@/models/CommunityConversation"
 import CommunityMessage from "@/models/CommunityMessage"
@@ -9,9 +10,24 @@ import DashboardProfile from "@/models/DashboardProfile"
 import { createMeeting, addParticipant } from "@/lib/community/realtime"
 import {
   emitCallEvent,
-  emitCallEventToMany,
   type CallEventPayload,
 } from "@/lib/community/events"
+
+// ── Helper: resolve display name with Clerk fallback ──
+async function resolveDisplayName(
+  authUserId: string,
+  profile: { displayName?: string } | null | undefined,
+): Promise<string> {
+  if (profile?.displayName) return profile.displayName
+  try {
+    const client = await clerkClient()
+    const user = await client.users.getUser(authUserId)
+    const name = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+    return name || user.username || user.emailAddresses[0]?.emailAddress || "User"
+  } catch {
+    return "User"
+  }
+}
 
 async function initAction() {
   const [, user] = await Promise.all([connectDB(), getAuthUser()])
@@ -147,8 +163,8 @@ export async function prepareCallTokens(callId: string): Promise<{
       DashboardProfile.findOne({ authUserId: call.receiverId }).select("displayName avatarUrl").lean(),
     ])
 
-    const callerName = callerProfile?.displayName || `${user.firstName} ${user.lastName}`.trim()
-    const receiverName = receiverProfile?.displayName || "User"
+    const callerName = await resolveDisplayName(call.callerId, callerProfile) || `${user.firstName} ${user.lastName}`.trim() || "User"
+    const receiverName = await resolveDisplayName(call.receiverId, receiverProfile)
 
     const meetingId = await createMeeting(`${callerName} → ${receiverName} (${call.type})`)
     const presetName = "group_call_host"
@@ -182,11 +198,11 @@ export async function prepareCallTokens(callId: string): Promise<{
       conversationId: call.conversationId.toString(),
     }
 
-    await emitCallEventToMany([user.userId, call.receiverId], {
-      ...basePayload,
-      authToken: receiverParticipant.authToken,
-      status: callerParticipant.authToken,
-    })
+    // Send each participant their own token in authToken (separate events)
+    await Promise.all([
+      emitCallEvent(user.userId, { ...basePayload, authToken: callerParticipant.authToken }),
+      emitCallEvent(call.receiverId, { ...basePayload, authToken: receiverParticipant.authToken }),
+    ])
 
     return { success: true, callerToken: callerParticipant.authToken }
   } catch (error) {
@@ -401,11 +417,13 @@ export async function pollIncomingCall(): Promise<{
       .select("displayName avatarUrl")
       .lean()
 
+    const callerName = await resolveDisplayName(incomingCall.callerId, callerProfile)
+
     return {
       incoming: {
         callId: incomingCall._id.toString(),
         callerId: incomingCall.callerId,
-        callerName: callerProfile?.displayName || "Unknown",
+        callerName,
         callerAvatar: callerProfile?.avatarUrl || null,
         callType: incomingCall.type,
         conversationId: incomingCall.conversationId.toString(),
@@ -447,12 +465,14 @@ export async function getActiveCall(): Promise<{ activeCall: ActiveCallInfo | nu
       .select("displayName avatarUrl")
       .lean()
 
+    const participantName = await resolveDisplayName(otherUserId, otherProfile)
+
     return {
       activeCall: {
         callId: call._id.toString(),
         callType: call.type,
         participantId: otherUserId,
-        participantName: otherProfile?.displayName || "Unknown",
+        participantName,
         participantAvatar: otherProfile?.avatarUrl || null,
         isIncoming: !isCaller,
         conversationId: call.conversationId.toString(),
@@ -463,6 +483,34 @@ export async function getActiveCall(): Promise<{ activeCall: ActiveCallInfo | nu
   } catch (error) {
     console.error("Error getting active call:", error)
     return { activeCall: null }
+  }
+}
+
+// ── Fetch own call token (fallback for when call:tokens-ready was missed) ──
+
+export async function fetchMyCallToken(callId: string): Promise<{
+  success: boolean
+  authToken?: string
+  error?: string
+}> {
+  try {
+    const user = await initAction()
+    if (!user) return { success: false, error: "Unauthorized" }
+
+    const call = await Call.findById(callId).select("callerId receiverId callerToken receiverToken status").lean()
+    if (!call) return { success: false, error: "Call not found" }
+
+    const isCaller = call.callerId === user.userId
+    const isReceiver = call.receiverId === user.userId
+    if (!isCaller && !isReceiver) return { success: false, error: "Not a participant" }
+
+    const authToken = isCaller ? call.callerToken : call.receiverToken
+    if (!authToken) return { success: false, error: "Token not yet available" }
+
+    return { success: true, authToken }
+  } catch (error) {
+    console.error("Error fetching call token:", error)
+    return { success: false, error: "Failed to fetch token" }
   }
 }
 
