@@ -3,6 +3,10 @@ import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import SmoothScrollProvider from "../providers/SmoothScrollProvider";
+import { ProfileProvider } from "@/components/profile-provider";
+import { AuthProvider } from "@/components/auth-provider";
+import { IncomingCallProvider } from "@/components/community";
+import { VividVoiceProvider } from "@/components/vivid-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,9 +36,17 @@ export default function RootLayout({
     >
       <html lang="en" className="dark">
         <body className={`${inter.variable} font-body antialiased bg-[#050505] text-white min-h-screen flex flex-col`}>
-          <SmoothScrollProvider>
-            {children}
-          </SmoothScrollProvider>
+          <ProfileProvider>
+            <AuthProvider>
+              <IncomingCallProvider>
+                <VividVoiceProvider>
+                  <SmoothScrollProvider>
+                    {children}
+                  </SmoothScrollProvider>
+                </VividVoiceProvider>
+              </IncomingCallProvider>
+            </AuthProvider>
+          </ProfileProvider>
         </body>
       </html>
     </ClerkProvider>

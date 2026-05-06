@@ -228,6 +228,7 @@ export const welcomePlatforms: WelcomePlatform[] = [
     id: "community",
     name: "Community",
     tagline: "Calls · Messages · Groups",
+    href: "/community",
     accent: "#FFCC2D",
     icon: Users,
     primaryLabel: "Unread",

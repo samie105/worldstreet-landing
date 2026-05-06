@@ -1,20 +1,54 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { LogOut, Phone, Video, MessageSquare, Search, X, PhoneMissed } from "lucide-react";
 import BalanceHero from "./BalanceHero";
 import PlatformPreviewCard from "./PlatformPreviewCard";
 import { welcomePlatforms, type AssetClass } from "./welcome-platforms-data";
 import { useClerk } from "@clerk/nextjs";
+import { useGlobalCall } from "@/components/community/incoming-call-provider";
+import {
+  getConversations,
+  getRecentUsers,
+  type ConversationWithDetails,
+  type UserSearchResult,
+} from "@/lib/community/actions/messages";
+import { getRecentCalls, type RecentCallItem } from "@/lib/community/actions/calls";
+import type { WalletAddresses } from "@/lib/balance-actions";
+import { avatarUrl } from "@/lib/utils";
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+
+function timeAgo(date: Date): string {
+  const diffMs = Date.now() - new Date(date).getTime();
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days === 1) return "yesterday";
+  return `${days}d ago`;
+}
+
+function fmtDuration(seconds: number): string {
+  if (!seconds) return "";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return s > 0 ? `${m}m ${s}s` : `${m}m`;
+}
 
 type Props = {
   firstName: string;
   lastName: string;
   initials: string;
   imageUrl?: string;
+  spotBalance?: number;
+  walletAddresses?: WalletAddresses;
 };
 
 const ASSET_TABS: { key: AssetClass; label: string }[] = [
@@ -23,43 +57,17 @@ const ASSET_TABS: { key: AssetClass; label: string }[] = [
   { key: "forex", label: "Forex" },
 ];
 
-const CONTACTS = [
-  { id: "c1", name: "Sarah Chen", handle: "@sarahc", online: true, avatar: "https://ui-avatars.com/api/?name=Sarah+Chen&background=0D8ABC&color=fff&bold=true" },
-  { id: "c2", name: "Trader Jay", handle: "@trader_jay", online: true, avatar: "https://ui-avatars.com/api/?name=Trader+Jay&background=7C3AED&color=fff&bold=true" },
-  { id: "c3", name: "Mike Thorne", handle: "@mscalp", online: false, avatar: "https://ui-avatars.com/api/?name=Mike+Thorne&background=EC4899&color=fff&bold=true" },
-  { id: "c4", name: "Kelly", handle: "@kelly", online: true, avatar: "https://ui-avatars.com/api/?name=Kelly&background=06B6D4&color=fff&bold=true" },
-  { id: "c5", name: "NG Forex Group", handle: "Group · 14", online: true, avatar: "https://ui-avatars.com/api/?name=NG+Forex&background=F59E0B&color=fff&bold=true" },
-  { id: "c6", name: "Lola (Admin)", handle: "@lola", online: false, avatar: "https://ui-avatars.com/api/?name=Lola&background=10B981&color=fff&bold=true" },
-  { id: "c7", name: "Carlos R.", handle: "@carlosr", online: true, avatar: "https://ui-avatars.com/api/?name=Carlos&background=8B5CF6&color=fff&bold=true" },
-  { id: "c8", name: "Spot Traders", handle: "Group · 38", online: true, avatar: "https://ui-avatars.com/api/?name=Spot+Traders&background=FFCC2D&color=000&bold=true" },
-];
-
-const RECENT_CALLS = {
-  voice: [
-    { id: "v1", name: "Sarah Chen", when: "5m ago", missed: true, duration: undefined },
-    { id: "v2", name: "NG Forex Group", when: "1h ago", missed: false, duration: "24m" },
-    { id: "v3", name: "Trader Jay", when: "3h ago", missed: false, duration: "12m" },
-    { id: "v4", name: "Kelly", when: "yesterday", missed: false, duration: "6m" },
-  ],
-  video: [
-    { id: "vid1", name: "Trader Jay", when: "22m ago", missed: true, duration: undefined },
-    { id: "vid2", name: "Mike Thorne", when: "2h ago", missed: false, duration: "8m 42s" },
-    { id: "vid3", name: "Kelly (Spot Traders)", when: "yesterday", missed: false, duration: "4m" },
-    { id: "vid4", name: "Carlos R.", when: "2d ago", missed: false, duration: "31m" },
-  ],
-} as const;
-
-const MESSAGES_PREVIEW = [
-  { id: "dm1", name: "Sarah Chen", preview: "Anyone watching SUI? Looking primed for a breakout.", when: "3m", unread: 2, online: true, avatar: "https://ui-avatars.com/api/?name=Sarah+Chen&background=0D8ABC&color=fff&bold=true" },
-  { id: "dm2", name: "Spot Traders", preview: "New trade alert posted in the group — BTC long signal.", when: "18m", unread: 5, online: true, avatar: "https://ui-avatars.com/api/?name=Spot+Traders&background=FFCC2D&color=000&bold=true" },
-  { id: "dm3", name: "Vivid AI", preview: "BTC/USDT is showing a bullish flag on the 4H…", when: "just now", unread: 1, online: true, avatar: "https://ui-avatars.com/api/?name=Vivid+AI&background=06B6D4&color=fff&bold=true" },
-  { id: "dm4", name: "Trader Jay", preview: "Yo, did you see the DXY move this morning?", when: "1h", unread: 0, online: true, avatar: "https://ui-avatars.com/api/?name=Trader+Jay&background=7C3AED&color=fff&bold=true" },
-  { id: "dm5", name: "NG Forex Group", preview: "Lola: Welcome to NG Forex! Post your setups here.", when: "2h", unread: 0, online: true, avatar: "https://ui-avatars.com/api/?name=NG+Forex&background=F59E0B&color=fff&bold=true" },
-  { id: "dm6", name: "Mike Thorne", preview: "Live floor replay is up if you missed it.", when: "4h", unread: 0, online: false, avatar: "https://ui-avatars.com/api/?name=Mike+Thorne&background=EC4899&color=fff&bold=true" },
-];
-
-export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: Props) {
+export default function WelcomeHub({
+  firstName,
+  lastName,
+  initials,
+  imageUrl,
+  spotBalance = 0,
+  walletAddresses = { tron: "", solana: "", ethereum: "" },
+}: Props) {
   const { signOut } = useClerk();
+  const router = useRouter();
+  const { startCall } = useGlobalCall();
   const greetingRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -69,6 +77,70 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
   const [callsOpen, setCallsOpen] = useState(false);
   const [callTab, setCallTab] = useState<"voice" | "video" | "messages">("voice");
   const [contactSearch, setContactSearch] = useState("");
+
+  // ── Real data ──────────────────────────────────────────────────────────────
+  const [contacts, setContacts] = useState<UserSearchResult[]>([]);
+  const [conversations, setConversations] = useState<ConversationWithDetails[]>([]);
+  const [recentCalls, setRecentCalls] = useState<RecentCallItem[]>([]);
+
+  const loadCommunityData = useCallback(async () => {
+    const [convResult, usersResult, callsResult] = await Promise.all([
+      getConversations(),
+      getRecentUsers(),
+      getRecentCalls(),
+    ]);
+    if (convResult.success && convResult.conversations) setConversations(convResult.conversations);
+    if (usersResult.success && usersResult.users) setContacts(usersResult.users);
+    if (callsResult.success && callsResult.calls) setRecentCalls(callsResult.calls);
+  }, []);
+
+  useEffect(() => {
+    loadCommunityData();
+
+    // Re-fetch when tab regains focus (e.g. returning from /community page)
+    const onVisible = () => {
+      if (document.visibilityState === "visible") loadCommunityData();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    // Also poll every 30s so conversation list stays fresh
+    const interval = setInterval(loadCommunityData, 30_000);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      clearInterval(interval);
+    };
+  }, [loadCommunityData]);
+
+  // Reload community data whenever the popover opens
+  useEffect(() => {
+    if (callsOpen) loadCommunityData();
+  }, [callsOpen, loadCommunityData]);
+
+  // Merge conversation participants + standalone contacts (deduped)
+  const allContacts = (() => {
+    const seen = new Set<string>();
+    const merged: UserSearchResult[] = [];
+    for (const conv of conversations) {
+      if (!seen.has(conv.participant.id)) {
+        seen.add(conv.participant.id);
+        merged.push({ id: conv.participant.id, name: conv.participant.name, avatar: conv.participant.avatar });
+      }
+    }
+    for (const c of contacts) {
+      if (!seen.has(c.id)) {
+        seen.add(c.id);
+        merged.push(c);
+      }
+    }
+    return merged;
+  })();
+
+  const filteredRecentCalls = recentCalls.filter(
+    (c) => callTab === "voice" ? c.type === "audio" : c.type === "video",
+  );
+
+  const onlineCount = conversations.filter((c) => c.participant.isOnline).length;
 
   // Live clock
   useEffect(() => {
@@ -237,7 +309,7 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
                           </div>
                           <div className="overflow-x-auto scrollbar-hide">
                             <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
-                              {CONTACTS
+                              {allContacts
                                 .filter((c) =>
                                   contactSearch
                                     ? c.name.toLowerCase().includes(contactSearch.toLowerCase())
@@ -246,20 +318,25 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
                                 .map((c) => (
                                   <button
                                     key={c.id}
+                                    onClick={() =>
+                                      startCall({
+                                        participantId: c.id,
+                                        participantName: c.name,
+                                        participantAvatar: c.avatar ?? undefined,
+                                        callType: callTab === "voice" ? "audio" : "video",
+                                      })
+                                    }
                                     className="flex flex-col items-center gap-1.5 group/ct"
                                     title={`${callTab === "voice" ? "Call" : "Video call"} ${c.name}`}
                                   >
                                     <div className="relative">
                                       <Image
-                                        src={c.avatar}
+                                        src={avatarUrl(c.avatar, c.name)}
                                         alt={c.name}
                                         width={40}
                                         height={40}
                                         className="w-10 h-10 rounded-full object-cover group-hover/ct:ring-2 group-hover/ct:ring-[#FFCC2D]/50 transition-all"
                                       />
-                                      {c.online && (
-                                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0a0a0a]" />
-                                      )}
                                     </div>
                                     <div className="flex flex-col items-center">
                                       <span className="text-[9px] text-gray-400 group-hover/ct:text-white transition-colors leading-none">
@@ -275,6 +352,9 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
                                     </div>
                                   </button>
                                 ))}
+                              {allContacts.length === 0 && (
+                                <span className="text-[11px] text-gray-600 py-2">No contacts yet</span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -284,91 +364,128 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
                           <div className="text-[9px] uppercase tracking-widest text-gray-500 mb-2">
                             Recent
                           </div>
-                          {RECENT_CALLS[callTab].map((c) => (
+                          {filteredRecentCalls
+                            .filter((c) =>
+                              contactSearch
+                                ? c.participantName.toLowerCase().includes(contactSearch.toLowerCase())
+                                : true
+                            )
+                            .map((c) => {
+                              const isMissed = c.status === "missed" || (c.status === "declined" && c.isCaller);
+                              return (
                             <div
                               key={c.id}
                               className="flex items-center gap-3 py-2.5 border-b border-white/[0.04] last:border-0"
                             >
                               <div
-                                className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold ${
-                                  c.missed
+                                className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold overflow-hidden ${
+                                  isMissed
                                     ? "bg-rose-500/10 text-rose-400"
                                     : "bg-white/[0.06] text-gray-300"
                                 }`}
                               >
-                                {c.name[0].toUpperCase()}
+                                {c.participantAvatar ? (
+                                  <Image src={c.participantAvatar} alt={c.participantName} width={36} height={36} className="w-full h-full object-cover rounded-full" />
+                                ) : (
+                                  c.participantName[0].toUpperCase()
+                                )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-[12px] text-white truncate">{c.name}</div>
-                                <div className={`flex items-center gap-1 text-[10px] ${c.missed ? "text-rose-400" : "text-gray-500"}`}>
-                                  {c.missed && <PhoneMissed className="w-2.5 h-2.5" />}
-                                  {c.missed ? `Missed · ${c.when}` : `${c.duration} · ${c.when}`}
+                                <div className="text-[12px] text-white truncate">{c.participantName}</div>
+                                <div className={`flex items-center gap-1 text-[10px] ${isMissed ? "text-rose-400" : "text-gray-500"}`}>
+                                  {isMissed && <PhoneMissed className="w-2.5 h-2.5" />}
+                                  {isMissed
+                                    ? `Missed · ${timeAgo(c.createdAt)}`
+                                    : `${fmtDuration(c.duration)} · ${timeAgo(c.createdAt)}`}
                                 </div>
                               </div>
                               <div className="flex items-center gap-1.5 shrink-0">
-                                <button className="w-7 h-7 flex items-center justify-center border border-white/[0.08] hover:bg-[#FFCC2D]/[0.08] hover:border-[#FFCC2D]/30 hover:text-[#FFCC2D] text-gray-500 transition-colors" title="Voice call">
+                                <button
+                                  onClick={() => startCall({ participantId: c.participantId, participantName: c.participantName, participantAvatar: c.participantAvatar ?? undefined, callType: "audio" })}
+                                  className="w-7 h-7 flex items-center justify-center border border-white/[0.08] hover:bg-[#FFCC2D]/[0.08] hover:border-[#FFCC2D]/30 hover:text-[#FFCC2D] text-gray-500 transition-colors"
+                                  title="Voice call"
+                                >
                                   <Phone className="w-3 h-3" />
                                 </button>
-                                <button className="w-7 h-7 flex items-center justify-center border border-white/[0.08] hover:bg-[#FFCC2D]/[0.08] hover:border-[#FFCC2D]/30 hover:text-[#FFCC2D] text-gray-500 transition-colors" title="Video call">
+                                <button
+                                  onClick={() => startCall({ participantId: c.participantId, participantName: c.participantName, participantAvatar: c.participantAvatar ?? undefined, callType: "video" })}
+                                  className="w-7 h-7 flex items-center justify-center border border-white/[0.08] hover:bg-[#FFCC2D]/[0.08] hover:border-[#FFCC2D]/30 hover:text-[#FFCC2D] text-gray-500 transition-colors"
+                                  title="Video call"
+                                >
                                   <Video className="w-3 h-3" />
                                 </button>
                               </div>
                             </div>
-                          ))}
+                            );
+                          })}
+                          {filteredRecentCalls.length === 0 && (
+                            <p className="text-[11px] text-gray-600 py-4 text-center">No recent {callTab} calls</p>
+                          )}
                         </div>
                       </>
                     )}
 
-                    {/* ── Messages tab ── */}
                     {callTab === "messages" && (
                       <div>
-                        {MESSAGES_PREVIEW
+                        {conversations
                           .filter((m) =>
                             contactSearch
-                              ? m.name.toLowerCase().includes(contactSearch.toLowerCase())
+                              ? m.participant.name.toLowerCase().includes(contactSearch.toLowerCase())
                               : true
                           )
-                          .map((m) => (
+                          .map((conv) => (
                             <div
-                              key={m.id}
+                              key={conv.id}
+                              onClick={() => { router.push(`/community`); setCallsOpen(false); }}
                               className="flex items-start gap-3 px-4 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors cursor-pointer"
                             >
                               <div className="relative shrink-0">
                                 <Image
-                                  src={m.avatar}
-                                  alt={m.name}
+                                  src={avatarUrl(conv.participant.avatar, conv.participant.name)}
+                                  alt={conv.participant.name}
                                   width={36}
                                   height={36}
                                   className="w-9 h-9 rounded-full object-cover"
                                 />
-                                {m.online && (
+                                {conv.participant.isOnline && (
                                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0a0a0a]" />
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2 mb-0.5">
-                                  <span className={`text-[12px] font-medium truncate ${m.unread ? "text-white" : "text-gray-400"}`}>
-                                    {m.name}
+                                  <span className={`text-[12px] font-medium truncate ${conv.unreadCount ? "text-white" : "text-gray-400"}`}>
+                                    {conv.participant.name}
                                   </span>
-                                  <span className="text-[10px] text-gray-600 shrink-0">{m.when}</span>
+                                  <span className="text-[10px] text-gray-600 shrink-0">{timeAgo(conv.lastMessageAt)}</span>
                                 </div>
-                                <div className="text-[11px] text-gray-500 truncate">{m.preview}</div>
+                                <div className="text-[11px] text-gray-500 truncate">{conv.lastMessage || "No messages yet"}</div>
                               </div>
-                              {m.unread > 0 && (
+                              {conv.unreadCount > 0 && (
                                 <div className="w-4 h-4 rounded-full bg-[#FFCC2D] flex items-center justify-center text-[8px] font-bold text-black shrink-0 mt-0.5">
-                                  {m.unread}
+                                  {conv.unreadCount}
                                 </div>
                               )}
                               <div className="flex items-center gap-1 shrink-0 ml-auto pl-2">
-                                <button className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-[#FFCC2D] transition-colors" title="Voice call">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); startCall({ participantId: conv.participant.id, participantName: conv.participant.name, participantAvatar: conv.participant.avatar ?? undefined, callType: "audio" }); }}
+                                  className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-[#FFCC2D] transition-colors"
+                                  title="Voice call"
+                                >
                                   <Phone className="w-3 h-3" />
                                 </button>
-                                <button className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-[#FFCC2D] transition-colors" title="Video call">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); startCall({ participantId: conv.participant.id, participantName: conv.participant.name, participantAvatar: conv.participant.avatar ?? undefined, callType: "video" }); }}
+                                  className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-[#FFCC2D] transition-colors"
+                                  title="Video call"
+                                >
                                   <Video className="w-3 h-3" />
                                 </button>
                               </div>
                             </div>
                           ))}
+                        {conversations.length === 0 && (
+                          <p className="text-[11px] text-gray-600 py-4 text-center px-4">No conversations yet. Go to Community to start chatting.</p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -376,7 +493,7 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
                   {/* Footer */}
                   <div className="px-4 py-2.5 border-t border-white/[0.08] shrink-0 flex items-center justify-between">
                     <span className="text-[10px] text-gray-600 uppercase tracking-widest">
-                      {CONTACTS.filter((c) => c.online).length} contacts online
+                      {onlineCount} contacts online
                     </span>
                     <span className="text-[10px] text-gray-600 uppercase tracking-widest">
                       Community lives here
@@ -453,7 +570,7 @@ export default function WelcomeHub({ firstName, lastName, initials, imageUrl }: 
           </div>
 
           <div ref={heroRef}>
-            <BalanceHero assetClass={assetClass} />
+            <BalanceHero assetClass={assetClass} spotBalance={spotBalance} walletAddresses={walletAddresses} />
           </div>
         </div>
       </div>
