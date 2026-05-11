@@ -1,11 +1,13 @@
 import { currentUser } from "@clerk/nextjs/server";
 import WelcomeHub from "../../components/welcome/WelcomeHub";
 import { getUserBalance } from "@/lib/balance-actions";
+import { getReltrixForexSnapshot } from "@/lib/reltrix-actions";
 
 export default async function WelcomePage() {
-  const [user, { spotBalance, walletAddresses }] = await Promise.all([
+  const [user, { spotBalance, walletAddresses }, reltrixForexSnapshot] = await Promise.all([
     currentUser(),
     getUserBalance(),
+    getReltrixForexSnapshot(),
   ]);
 
   const firstName = user?.firstName ?? "Trader";
@@ -19,6 +21,7 @@ export default async function WelcomePage() {
       imageUrl={user?.imageUrl}
       spotBalance={spotBalance}
       walletAddresses={walletAddresses}
+      reltrixForexSnapshot={reltrixForexSnapshot}
     />
   );
 }

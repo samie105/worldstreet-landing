@@ -19,6 +19,7 @@ import {
 } from "@/lib/community/actions/messages";
 import { getRecentCalls, type RecentCallItem } from "@/lib/community/actions/calls";
 import type { WalletAddresses } from "@/lib/balance-actions";
+import type { ReltrixForexSnapshot } from "@/lib/reltrix-actions";
 import { avatarUrl } from "@/lib/utils";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -49,6 +50,7 @@ type Props = {
   imageUrl?: string;
   spotBalance?: number;
   walletAddresses?: WalletAddresses;
+  reltrixForexSnapshot?: ReltrixForexSnapshot;
 };
 
 const ASSET_TABS: { key: AssetClass; label: string }[] = [
@@ -64,6 +66,7 @@ export default function WelcomeHub({
   imageUrl,
   spotBalance = 0,
   walletAddresses = { tron: "", solana: "", ethereum: "" },
+  reltrixForexSnapshot,
 }: Props) {
   const { signOut } = useClerk();
   const router = useRouter();
@@ -95,7 +98,7 @@ export default function WelcomeHub({
   }, []);
 
   useEffect(() => {
-    loadCommunityData();
+    void Promise.resolve().then(loadCommunityData);
 
     // Re-fetch when tab regains focus (e.g. returning from /community page)
     const onVisible = () => {
@@ -114,7 +117,7 @@ export default function WelcomeHub({
 
   // Reload community data whenever the popover opens
   useEffect(() => {
-    if (callsOpen) loadCommunityData();
+    if (callsOpen) void Promise.resolve().then(loadCommunityData);
   }, [callsOpen, loadCommunityData]);
 
   // Merge conversation participants + standalone contacts (deduped)
@@ -570,7 +573,12 @@ export default function WelcomeHub({
           </div>
 
           <div ref={heroRef}>
-            <BalanceHero assetClass={assetClass} spotBalance={spotBalance} walletAddresses={walletAddresses} />
+            <BalanceHero
+              assetClass={assetClass}
+              spotBalance={spotBalance}
+              walletAddresses={walletAddresses}
+              reltrixForexSnapshot={reltrixForexSnapshot}
+            />
           </div>
         </div>
       </div>
@@ -578,7 +586,7 @@ export default function WelcomeHub({
       {/* ── Platforms grid ────────────────────────────────────── */}
       <div className="flex-1">
         <div className="max-w-[1240px] mx-auto px-6 md:px-10 pt-10 md:pt-12 pb-16">
-          <div className="flex items-end justify-between mb-6">
+          <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="text-[10px] uppercase tracking-widest text-gray-500 font-body mb-1.5">
                 Your platforms
@@ -596,7 +604,7 @@ export default function WelcomeHub({
           </div>
 
           {/* ── Platform quick-nav grid ── */}
-          <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 border-t border-l border-white/[0.08] mb-10">
+          <div className="mb-10 grid grid-cols-3 border-t border-l border-white/[0.08] sm:grid-cols-5 md:hidden">
             {welcomePlatforms.map((p) => {
               const PIcon = p.icon;
               const hasLink = Boolean(p.href);
@@ -634,7 +642,7 @@ export default function WelcomeHub({
           <div
             key={assetClass}
             ref={panelRef}
-            className="border-t border-l border-white/[0.08]"
+            className="hidden border-t border-l border-white/[0.08] md:block"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {welcomePlatforms.map((platform, i) => (

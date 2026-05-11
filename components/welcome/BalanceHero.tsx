@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import {
   Copy, Check,
   ArrowDownToLine, ArrowUpFromLine, ArrowLeftRight,
-  ChevronDown, TrendingUp, TrendingDown, Banknote, RefreshCw,
+  ChevronDown, TrendingUp, RefreshCw,
 } from "lucide-react";
 import type { AssetClass } from "./welcome-platforms-data";
 import type { WalletAddresses } from "@/lib/balance-actions";
@@ -19,6 +19,8 @@ import {
   type PositionInfo,
 } from "@/lib/spotv2/ledger-actions";
 import { getFxRates, type FxRates } from "@/lib/fx-actions";
+import type { ReltrixForexSnapshot } from "@/lib/reltrix-actions";
+import BalanceActionModal, { type BalanceAction } from "./BalanceActionModal";
 
 // ─── shared ─────────────────────────────────────────────────────────────────
 
@@ -27,19 +29,36 @@ const formatUSD = (n: number) =>
 
 const truncAddr = (a: string) => (a.length < 14 ? a : `${a.slice(0, 8)}…${a.slice(-6)}`);
 
-const ActionBtn = ({ href, icon: Icon, label, primary }: { href: string; icon: React.ElementType; label: string; primary?: boolean }) => (
-  <a
-    href={href}
-    className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold transition-colors ${
-      primary
-        ? "bg-[#FFCC2D] hover:bg-[#FFCC2D]/90 text-black"
-        : "border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.06] text-white"
-    }`}
-  >
-    <Icon className="w-3.5 h-3.5" />
-    {label}
-  </a>
+type ActionBtnProps = {
+  icon: React.ElementType;
+  label: string;
+  primary?: boolean;
+} & (
+  | { href: string; onClick?: never }
+  | { href?: never; onClick: () => void }
 );
+
+const ActionBtn = ({ href, onClick, icon: Icon, label, primary }: ActionBtnProps) => {
+  const cls = `inline-flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold transition-colors ${
+    primary
+      ? "bg-[#FFCC2D] hover:bg-[#FFCC2D]/90 text-black"
+      : "border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.06] text-white"
+  }`;
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={cls}>
+        <Icon className="w-3.5 h-3.5" />
+        {label}
+      </button>
+    );
+  }
+  return (
+    <a href={href} className={cls}>
+      <Icon className="w-3.5 h-3.5" />
+      {label}
+    </a>
+  );
+};
 
 // ─── CRYPTO ─────────────────────────────────────────────────────────────────
 
@@ -232,7 +251,7 @@ function CryptoBalance({
           ),
         ].filter(Boolean);
         return (
-          <div className={`grid border-t border-white/[0.08] grid-cols-1 sm:grid-cols-${cells.length}`}>
+          <div className={`hidden md:grid border-t border-white/[0.08] grid-cols-1 sm:grid-cols-${cells.length}`}>
             {cells}
           </div>
         );
@@ -243,65 +262,111 @@ function CryptoBalance({
 
 // ─── FOREX ───────────────────────────────────────────────────────────────────
 
-const FOREX_BALANCE = 86420.0;
+function formatIsoMinute(value: string) {
+  const match = value.match(/T(\d{2}:\d{2})/);
+  return match ? `${match[1]} UTC` : "Just now";
+}
 
-const OPEN_POSITIONS = [
-  { pair: "EUR/USD", side: "buy", size: "0.80 lot", pnl: "+$320", pos: true },
-  { pair: "GBP/JPY", side: "sell", size: "1.20 lot", pnl: "+$184", pos: true },
-  { pair: "USD/CHF", side: "buy", size: "0.50 lot", pnl: "-$48", pos: false },
-];
+function ForexBalance({
+  balRef,
+  onAction,
+  reltrixForexSnapshot,
+}: {
+  balRef: React.RefObject<HTMLSpanElement | null>;
+  onAction: (a: BalanceAction) => void;
+  reltrixForexSnapshot?: ReltrixForexSnapshot;
+}) {
+  const liveSnapshot = reltrixForexSnapshot?.isLive ? reltrixForexSnapshot : null;
+  const animatedBalance = liveSnapshot?.totalWalletBalance ?? 0;
+  const fundedRate = liveSnapshot && liveSnapshot.totalClients > 0
+    ? (liveSnapshot.fundedWalletCount / liveSnapshot.totalClients) * 100
+    : 0;
 
-function ForexBalance({ balRef }: { balRef: React.RefObject<HTMLSpanElement | null> }) {
   useEffect(() => {
     if (!balRef.current) return;
     const el = balRef.current;
     const obj = { v: 0 };
-    const tween = gsap.to(obj, { v: FOREX_BALANCE, duration: 0.9, ease: "power3.out", onUpdate: () => { el.textContent = formatUSD(obj.v); } });
+    const tween = gsap.to(obj, { v: animatedBalance, duration: 0.9, ease: "power3.out", onUpdate: () => { el.textContent = formatUSD(obj.v); } });
     return () => { tween.kill(); };
-  }, [balRef]);
+  }, [animatedBalance, balRef]);
 
   return (
     <>
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-6">
         <div>
-          <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">All accounts</div>
+          <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">Forex CRM portfolio</div>
           <span ref={balRef} className="block text-4xl md:text-5xl lg:text-6xl font-medium text-white tabular-nums tracking-tight">$0.00</span>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="text-[11px] text-gray-500">Margin used: <span className="text-white">$4,820</span></span>
+            <span className="text-[11px] text-gray-500">Funded accounts: <span className="text-white">{liveSnapshot?.fundedWalletCount ?? 0}</span></span>
             <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
-            <span className="text-[11px] text-gray-500">Free margin: <span className="text-emerald-400">$81,600</span></span>
+            <span className="text-[11px] text-gray-500">CRM clients: <span className="text-white">{liveSnapshot?.totalClients ?? 0}</span></span>
             <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
-            <span className="text-[11px] text-gray-500">Leverage: <span className="text-white">1:100</span></span>
+            <span className="text-[11px] text-gray-500">
+              Lead queue: <span className={liveSnapshot?.totalLeads ? "text-white" : "text-emerald-400"}>{liveSnapshot?.totalLeads ? liveSnapshot.totalLeads : "clear"}</span>
+            </span>
+            {reltrixForexSnapshot && (
+              <>
+                <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
+                <span className="text-[11px] text-gray-500">
+                  Feed: <span className={liveSnapshot ? "text-emerald-400" : "text-rose-400"}>{liveSnapshot ? "live" : "offline"}</span>
+                </span>
+              </>
+            )}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ActionBtn href="https://dashboard.worldstreetgold.com/futures" icon={TrendingUp} label="New Trade" primary />
-          <ActionBtn href="https://dashboard.worldstreetgold.com/deposit" icon={ArrowDownToLine} label="Fund" />
-          <ActionBtn href="https://dashboard.worldstreetgold.com/withdraw" icon={ArrowUpFromLine} label="Withdraw" />
+          <ActionBtn onClick={() => onAction("deposit")} icon={ArrowDownToLine} label="Fund" />
+          <ActionBtn onClick={() => onAction("withdraw")} icon={ArrowUpFromLine} label="Withdraw" />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-white/[0.08]">
+      <div className="hidden md:grid grid-cols-1 sm:grid-cols-4 border-t border-white/[0.08]">
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
-          <div className="flex items-center gap-1.5 mb-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /><span className="text-[10px] uppercase tracking-widest text-gray-500">Floating P&amp;L</span></div>
-          <div className="text-[18px] md:text-xl font-medium text-emerald-400 tabular-nums">+$456.00</div>
-          <div className="text-[10px] text-gray-500 mt-0.5">3 open positions</div>
+          <div className="flex items-center gap-1.5 mb-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /><span className="text-[10px] uppercase tracking-widest text-gray-500">Funded Accounts</span></div>
+          <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">{liveSnapshot?.fundedWalletCount ?? 0}</div>
+          <div className="text-[10px] text-gray-500 mt-0.5">Accounts with positive wallet balance</div>
         </div>
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
-          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Open Trades</div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
-            {OPEN_POSITIONS.map((p) => (
-              <div key={p.pair} className="flex items-center gap-1.5">
-                <span className="text-[11px] text-white font-medium">{p.pair}</span>
-                <span className={`text-[10px] font-medium ${p.pos ? "text-emerald-400" : "text-rose-400"}`}>{p.pnl}</span>
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">CRM Clients</div>
+          <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">{liveSnapshot?.totalClients ?? 0}</div>
+          <div className="text-[10px] text-gray-500 mt-0.5">Client records available for matching</div>
+        </div>
+        <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Top Funded</div>
+          <div className="flex flex-col gap-1.5">
+            {(liveSnapshot?.topWallets ?? []).slice(0, 3).map((wallet) => (
+              <div key={wallet.crmId} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                <div className="min-w-0">
+                  <div className="truncate text-[11px] font-medium text-white">{wallet.clientName ?? `CRM #${wallet.crmId}`}</div>
+                  <div className="truncate text-[9px] text-gray-600">CRM #{wallet.crmId}</div>
+                </div>
+                <span className="text-[11px] text-emerald-400 tabular-nums">{formatUSD(wallet.balance)}</span>
               </div>
             ))}
+            {(!liveSnapshot || liveSnapshot.topWallets.length === 0) && (
+              <div className="text-[10px] text-gray-500">No funded accounts returned yet.</div>
+            )}
           </div>
         </div>
         <div className="px-4 py-4">
-          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Win Rate (30d)</div>
-          <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">64%</div>
-          <div className="text-[10px] text-gray-500 mt-0.5">EUR · GBP · USD · JPY</div>
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <span className={`h-1.5 w-1.5 rounded-full ${liveSnapshot ? "bg-emerald-400" : "bg-rose-400"}`} />
+            <span className="text-[10px] uppercase tracking-widest text-gray-500">Funding Coverage</span>
+          </div>
+          <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">
+            {liveSnapshot ? `${fundedRate.toFixed(1)}%` : "Offline"}
+          </div>
+          <div className="text-[10px] text-gray-500 mt-0.5">
+            {liveSnapshot
+              ? `${liveSnapshot.fundedWalletCount} funded of ${liveSnapshot.totalClients} CRM clients`
+              : reltrixForexSnapshot?.message ?? "No live portfolio data"}
+          </div>
+          {reltrixForexSnapshot && (
+            <div className="mt-2 text-[9px] uppercase tracking-widest text-gray-600 tabular-nums">
+              Updated {formatIsoMinute(reltrixForexSnapshot.checkedAt)}
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -322,9 +387,11 @@ const formatNGN = (n: number) =>
 function FiatBalance({
   balRef,
   spotBalance,
+  onAction,
 }: {
   balRef: React.RefObject<HTMLSpanElement | null>;
   spotBalance: number;
+  onAction: (a: BalanceAction) => void;
 }) {
   const [fxRates, setFxRates] = useState<FxRates | null>(null);
   const [currency, setCurrency] = useState<"USD" | "NGN">("USD");
@@ -436,13 +503,13 @@ function FiatBalance({
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ActionBtn href="https://dashboard.worldstreetgold.com/deposit" icon={ArrowDownToLine} label="Add Money" primary />
-          <ActionBtn href="https://dashboard.worldstreetgold.com/withdraw" icon={ArrowUpFromLine} label="Withdraw" />
-          <ActionBtn href="https://dashboard.worldstreetgold.com/swap" icon={RefreshCw} label="Convert" />
+          <ActionBtn onClick={() => onAction("deposit")} icon={ArrowDownToLine} label="Add Money" primary />
+          <ActionBtn onClick={() => onAction("withdraw")} icon={ArrowUpFromLine} label="Withdraw" />
+          <ActionBtn onClick={() => onAction("convert")} icon={RefreshCw} label="Convert" />
         </div>
       </div>
 
-      <div className={`grid border-t border-white/[0.08] grid-cols-1 sm:grid-cols-${cells.length}`}>
+      <div className={`hidden md:grid border-t border-white/[0.08] grid-cols-1 sm:grid-cols-${cells.length}`}>
         {cells}
       </div>
     </>
@@ -455,20 +522,34 @@ export default function BalanceHero({
   assetClass = "fiat",
   spotBalance = 0,
   walletAddresses = { tron: "", solana: "", ethereum: "" },
+  reltrixForexSnapshot,
 }: {
   assetClass?: AssetClass;
   spotBalance?: number;
   walletAddresses?: WalletAddresses;
+  reltrixForexSnapshot?: ReltrixForexSnapshot;
 }) {
   const balRef = useRef<HTMLSpanElement>(null);
+  const [action, setAction] = useState<BalanceAction | null>(null);
+  const handleAction = useCallback((a: BalanceAction) => setAction(a), []);
+  const handleClose = useCallback(() => setAction(null), []);
 
   return (
     <div className="w-full" key={assetClass}>
       {assetClass === "crypto" && (
-        <CryptoBalance balRef={balRef} spotBalance={spotBalance} walletAddresses={walletAddresses} />
+        <CryptoBalance
+          balRef={balRef}
+          spotBalance={spotBalance}
+          walletAddresses={walletAddresses}
+        />
       )}
-      {assetClass === "forex" && <ForexBalance balRef={balRef} />}
-      {assetClass === "fiat" && <FiatBalance balRef={balRef} spotBalance={spotBalance} />}
+      {assetClass === "forex" && (
+        <ForexBalance balRef={balRef} onAction={handleAction} reltrixForexSnapshot={reltrixForexSnapshot} />
+      )}
+      {assetClass === "fiat" && (
+        <FiatBalance balRef={balRef} spotBalance={spotBalance} onAction={handleAction} />
+      )}
+      <BalanceActionModal action={action} onClose={handleClose} />
     </div>
   );
 }
