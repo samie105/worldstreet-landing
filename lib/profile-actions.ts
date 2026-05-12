@@ -10,6 +10,7 @@ export type ProfileData = {
   _id: string
   authUserId: string
   email: string
+  reltrixCrmId?: string
   displayName: string
   avatarUrl: string
   bio: string

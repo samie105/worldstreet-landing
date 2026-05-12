@@ -295,7 +295,7 @@ function ForexBalance({
           <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">Forex account balance</div>
           <span ref={balRef} className="block text-4xl md:text-5xl lg:text-6xl font-medium text-white tabular-nums tracking-tight">$0.00</span>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="text-[11px] text-gray-500">Client: <span className="text-white">{linkedSnapshot?.client?.name ?? "Not linked"}</span></span>
+            <span className="text-[11px] text-gray-500">Client: <span className="text-white">{linkedSnapshot?.client?.name ?? "Connect account"}</span></span>
             <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
             <span className="text-[11px] text-gray-500">CRM ID: <span className="text-white">{linkedSnapshot?.client?.crmId ?? "—"}</span></span>
             <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
@@ -306,7 +306,7 @@ function ForexBalance({
               <>
                 <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
                 <span className="text-[11px] text-gray-500">
-                  Feed: <span className={linkedSnapshot ? "text-emerald-400" : "text-amber-300"}>{linkedSnapshot ? "linked" : "needs match"}</span>
+                  Feed: <span className={linkedSnapshot ? "text-emerald-400" : "text-amber-300"}>{linkedSnapshot ? "linked" : "not linked"}</span>
                 </span>
               </>
             )}
@@ -327,8 +327,8 @@ function ForexBalance({
         </div>
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">CRM Profile</div>
-          <div className="truncate text-[18px] md:text-xl font-medium text-white">{linkedSnapshot?.client?.name ?? "Unmatched"}</div>
-          <div className="text-[10px] text-gray-500 mt-0.5">{linkedSnapshot?.client ? `CRM #${linkedSnapshot.client.crmId}` : reltrixForexSnapshot?.message ?? "No CRM match"}</div>
+          <div className="truncate text-[18px] md:text-xl font-medium text-white">{linkedSnapshot?.client?.name ?? "Not connected"}</div>
+          <div className="text-[10px] text-gray-500 mt-0.5">{linkedSnapshot?.client ? `CRM #${linkedSnapshot.client.crmId}` : "Link this Clerk ID to a Reltrix CRM ID"}</div>
         </div>
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Wallets</div>
@@ -353,12 +353,12 @@ function ForexBalance({
             <span className="text-[10px] uppercase tracking-widest text-gray-500">Account Link</span>
           </div>
           <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">
-            {linkedSnapshot?.matchSource ? linkedSnapshot.matchSource.replace("_", " ") : "Pending"}
+            {linkedSnapshot?.matchSource ? linkedSnapshot.matchSource.replace("_", " ") : "Needs link"}
           </div>
           <div className="text-[10px] text-gray-500 mt-0.5">
             {linkedSnapshot
-              ? "Matched from Clerk identity"
-              : reltrixForexSnapshot?.message ?? "No live account data"}
+              ? "Matched from saved Clerk identity"
+              : "Save the user’s Reltrix CRM ID against their Clerk ID"}
           </div>
           {reltrixForexSnapshot && (
             <div className="mt-2 text-[9px] uppercase tracking-widest text-gray-600 tabular-nums">

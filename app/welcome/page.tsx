@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import WelcomeHub from "../../components/welcome/WelcomeHub";
+import { getPersistedReltrixCrmId } from "@/lib/account-linking";
 import { getUserBalance } from "@/lib/balance-actions";
 import { getReltrixForexSnapshot } from "@/lib/reltrix-actions";
 
@@ -11,11 +12,12 @@ export default async function WelcomePage() {
 
   const firstName = user?.firstName ?? "Trader";
   const lastName = user?.lastName ?? "";
-  const primaryEmail = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses[0]?.emailAddress ?? null;
-  const primaryPhone = user?.primaryPhoneNumber?.phoneNumber ?? user?.phoneNumbers[0]?.phoneNumber ?? null;
+  const reltrixLink = await getPersistedReltrixCrmId({
+    authUserId: user?.id,
+    privateMetadata: user?.privateMetadata,
+  });
   const reltrixForexSnapshot = await getReltrixForexSnapshot({
-    email: primaryEmail,
-    phone: primaryPhone,
+    crmId: reltrixLink?.crmId,
   });
 
   return (

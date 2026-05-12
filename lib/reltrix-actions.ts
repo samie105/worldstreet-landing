@@ -18,6 +18,7 @@ export type ReltrixLookupInput = {
   crmId?: string | null;
   email?: string | null;
   phone?: string | null;
+  allowContactLookup?: boolean;
 };
 
 export type ReltrixForexSnapshot = {
@@ -150,13 +151,21 @@ async function resolveClient(input: ReltrixLookupInput): Promise<{ client: Reltr
     };
   }
 
+  if (!input.allowContactLookup) {
+    return { client: null, matchSource: null, message: "No saved Reltrix account link found for this Clerk user." };
+  }
+
   const email = input.email?.trim().toLowerCase();
   if (email) {
     const clients = await searchClients({ email });
-    const exact = clients.find((client) => client.email?.toLowerCase() === email) ?? (clients.length === 1 ? clients[0] : null);
+    const exact = clients.find((client) => client.email?.toLowerCase() === email) ?? null;
 
     if (exact) {
       return { client: exact, matchSource: "email", message: "Reltrix client matched by Clerk email." };
+    }
+
+    if (clients.length > 0) {
+      return { client: null, matchSource: null, message: "Reltrix email lookup did not return an exact match. Saved CRM ID is required." };
     }
   }
 
@@ -165,7 +174,7 @@ async function resolveClient(input: ReltrixLookupInput): Promise<{ client: Reltr
     const clients = await searchClients({ phone });
 
     if (clients.length === 1) {
-      return { client: clients[0], matchSource: "phone", message: "Reltrix client matched by Clerk phone." };
+      return { client: null, matchSource: null, message: "Reltrix phone lookup found a possible client. Saved CRM ID or exact email is required." };
     }
 
     if (clients.length > 1) {

@@ -12,6 +12,7 @@ export interface IBankDetail {
 export interface IDashboardProfile extends Document {
   authUserId: string
   email: string
+  reltrixCrmId?: string
   displayName: string
   avatarUrl: string
   bio: string
@@ -40,6 +41,7 @@ const DashboardProfileSchema = new Schema<IDashboardProfile>(
   {
     authUserId: { type: String, required: true, unique: true, index: true },
     email: { type: String, required: true, unique: true, index: true, lowercase: true },
+    reltrixCrmId: { type: String, default: "", index: true },
     displayName: { type: String, default: "" },
     avatarUrl: { type: String, default: "" },
     bio: { type: String, default: "", maxlength: 500 },
