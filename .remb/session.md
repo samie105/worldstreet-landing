@@ -1648,3 +1648,51 @@ I’m considering a hypothesis about the debug card showing up because BalanceHe
 The debug text is gone and the cards now read like a CRM portfolio summary. I’m running the focused checks and a small data-shape probe to make sure matched names/balances survive the
 - `13:55:41` saved `lib/reltrix-actions.ts`
 - `13:55:41` saved `components/welcome/BalanceHero.tsx`
+- `14:07:01` 💬 **user**: okay that's fine, now it fetches for all the usser, how can we fetch this to fetch for a particular user givein that we're using on clerk so what do w
+- `14:08:06` 💬 **user**: i want to mail them
+- `14:08:07` 🤖 **ai**: Right now Reltrix is giving us global CRM data:
+
+- all clients
+- all leads
+- all funded wallets
+
+To fetch for one logged-in Clerk user properly, we need a reliable way to link a Clerk user to a Reltri
+- `11:21:35` 💬 **user**: Three new endpoints have been added to the API:
+•	get_client_by_id
+•	get_client_by_phone_or_email
+•	get_wallet_by_client_id
+
+so you'd test and know ho
+- `11:22:00` 🤖 **ai**: I’ll first refresh the Swagger spec to confirm the exact paths, query/body parameters, and response shapes for those new endpoints, then I’ll test them with known sample CRM data without exposing the 
+- `11:22:36` 🤖 **ai**: Swagger confirms the new endpoints are exactly what we need: lookup by CRM ID, lookup by phone/email, and wallet by CRM ID. I’m pulling their schema definitions next so the wiring plan can be typed cl
+- `11:23:36` 🤖 **ai**: **Updating methods for client matches**
+
+I need to revise the page.tsx to ensure I'm passing the primary email or phone to getReltrixForexSnapshot. If a crmId is provided, I'll use get_client_by_id an
+- `11:24:36` 🤖 **ai**: I’m going to wire the code toward per-user fetching now: Clerk email/phone resolves one Reltrix client, that
+fetches the client profile and wallet, and the Forex UI becomes a personal account summary 
+- `11:24:46` saved `lib/reltrix-actions.ts`
+- `11:24:46` saved `app/welcome/page.tsx`
+- `11:24:46` saved `components/welcome/BalanceHero.tsx`
+- `11:25:36` 🤖 **ai**: ```
+```
+
+```
+```
+
+```
+```
+**Validating code and testing**
+
+I need to validate and possibly test the helper because it uses the current user's email, which might be unknown. Running TypeScript compile 
+- `11:26:36` 🤖 **ai**: Tested the three new endpoints and wired the app toward per-user Forex data.
+
+What works:
+
+- `GET /api/v1/get_client_by_id.php?id=90135`
+  - Returns `200`
+  - Gives one CRM client profile
+
+- `POST /ap
+- `11:52:41` saved `app/welcome/page.tsx`
+- `11:52:41` saved `components/welcome/BalanceHero.tsx`
+- `11:52:41` saved `lib/reltrix-actions.ts`

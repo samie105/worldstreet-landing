@@ -277,10 +277,8 @@ function ForexBalance({
   reltrixForexSnapshot?: ReltrixForexSnapshot;
 }) {
   const liveSnapshot = reltrixForexSnapshot?.isLive ? reltrixForexSnapshot : null;
-  const animatedBalance = liveSnapshot?.totalWalletBalance ?? 0;
-  const fundedRate = liveSnapshot && liveSnapshot.totalClients > 0
-    ? (liveSnapshot.fundedWalletCount / liveSnapshot.totalClients) * 100
-    : 0;
+  const linkedSnapshot = liveSnapshot?.hasClientMatch ? liveSnapshot : null;
+  const animatedBalance = linkedSnapshot?.totalWalletBalance ?? 0;
 
   useEffect(() => {
     if (!balRef.current) return;
@@ -294,21 +292,21 @@ function ForexBalance({
     <>
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-6">
         <div>
-          <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">Forex CRM portfolio</div>
+          <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">Forex account balance</div>
           <span ref={balRef} className="block text-4xl md:text-5xl lg:text-6xl font-medium text-white tabular-nums tracking-tight">$0.00</span>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="text-[11px] text-gray-500">Funded accounts: <span className="text-white">{liveSnapshot?.fundedWalletCount ?? 0}</span></span>
+            <span className="text-[11px] text-gray-500">Client: <span className="text-white">{linkedSnapshot?.client?.name ?? "Not linked"}</span></span>
             <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
-            <span className="text-[11px] text-gray-500">CRM clients: <span className="text-white">{liveSnapshot?.totalClients ?? 0}</span></span>
+            <span className="text-[11px] text-gray-500">CRM ID: <span className="text-white">{linkedSnapshot?.client?.crmId ?? "—"}</span></span>
             <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
             <span className="text-[11px] text-gray-500">
-              Lead queue: <span className={liveSnapshot?.totalLeads ? "text-white" : "text-emerald-400"}>{liveSnapshot?.totalLeads ? liveSnapshot.totalLeads : "clear"}</span>
+              Wallets: <span className="text-white">{linkedSnapshot?.fundedWalletCount ?? 0}</span>
             </span>
             {reltrixForexSnapshot && (
               <>
                 <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
                 <span className="text-[11px] text-gray-500">
-                  Feed: <span className={liveSnapshot ? "text-emerald-400" : "text-rose-400"}>{liveSnapshot ? "live" : "offline"}</span>
+                  Feed: <span className={linkedSnapshot ? "text-emerald-400" : "text-amber-300"}>{linkedSnapshot ? "linked" : "needs match"}</span>
                 </span>
               </>
             )}
@@ -324,43 +322,43 @@ function ForexBalance({
       <div className="hidden md:grid grid-cols-1 sm:grid-cols-4 border-t border-white/[0.08]">
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
           <div className="flex items-center gap-1.5 mb-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /><span className="text-[10px] uppercase tracking-widest text-gray-500">Funded Accounts</span></div>
-          <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">{liveSnapshot?.fundedWalletCount ?? 0}</div>
-          <div className="text-[10px] text-gray-500 mt-0.5">Accounts with positive wallet balance</div>
+          <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">{linkedSnapshot?.fundedWalletCount ?? 0}</div>
+          <div className="text-[10px] text-gray-500 mt-0.5">Wallets attached to this user</div>
         </div>
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
-          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">CRM Clients</div>
-          <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">{liveSnapshot?.totalClients ?? 0}</div>
-          <div className="text-[10px] text-gray-500 mt-0.5">Client records available for matching</div>
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">CRM Profile</div>
+          <div className="truncate text-[18px] md:text-xl font-medium text-white">{linkedSnapshot?.client?.name ?? "Unmatched"}</div>
+          <div className="text-[10px] text-gray-500 mt-0.5">{linkedSnapshot?.client ? `CRM #${linkedSnapshot.client.crmId}` : reltrixForexSnapshot?.message ?? "No CRM match"}</div>
         </div>
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
-          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Top Funded</div>
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Wallets</div>
           <div className="flex flex-col gap-1.5">
-            {(liveSnapshot?.topWallets ?? []).slice(0, 3).map((wallet) => (
+            {(linkedSnapshot?.topWallets ?? []).slice(0, 3).map((wallet) => (
               <div key={wallet.crmId} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                 <div className="min-w-0">
                   <div className="truncate text-[11px] font-medium text-white">{wallet.clientName ?? `CRM #${wallet.crmId}`}</div>
-                  <div className="truncate text-[9px] text-gray-600">CRM #{wallet.crmId}</div>
+                  <div className="truncate text-[9px] text-gray-600">Wallet balance</div>
                 </div>
                 <span className="text-[11px] text-emerald-400 tabular-nums">{formatUSD(wallet.balance)}</span>
               </div>
             ))}
-            {(!liveSnapshot || liveSnapshot.topWallets.length === 0) && (
-              <div className="text-[10px] text-gray-500">No funded accounts returned yet.</div>
+            {(!linkedSnapshot || linkedSnapshot.topWallets.length === 0) && (
+              <div className="text-[10px] text-gray-500">No wallet balance returned yet.</div>
             )}
           </div>
         </div>
         <div className="px-4 py-4">
           <div className="flex items-center gap-1.5 mb-1.5">
-            <span className={`h-1.5 w-1.5 rounded-full ${liveSnapshot ? "bg-emerald-400" : "bg-rose-400"}`} />
-            <span className="text-[10px] uppercase tracking-widest text-gray-500">Funding Coverage</span>
+            <span className={`h-1.5 w-1.5 rounded-full ${linkedSnapshot ? "bg-emerald-400" : "bg-amber-300"}`} />
+            <span className="text-[10px] uppercase tracking-widest text-gray-500">Account Link</span>
           </div>
           <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">
-            {liveSnapshot ? `${fundedRate.toFixed(1)}%` : "Offline"}
+            {linkedSnapshot?.matchSource ? linkedSnapshot.matchSource.replace("_", " ") : "Pending"}
           </div>
           <div className="text-[10px] text-gray-500 mt-0.5">
-            {liveSnapshot
-              ? `${liveSnapshot.fundedWalletCount} funded of ${liveSnapshot.totalClients} CRM clients`
-              : reltrixForexSnapshot?.message ?? "No live portfolio data"}
+            {linkedSnapshot
+              ? "Matched from Clerk identity"
+              : reltrixForexSnapshot?.message ?? "No live account data"}
           </div>
           {reltrixForexSnapshot && (
             <div className="mt-2 text-[9px] uppercase tracking-widest text-gray-600 tabular-nums">

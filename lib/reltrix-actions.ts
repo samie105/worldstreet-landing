@@ -7,10 +7,26 @@ export type ReltrixWalletSummary = {
   balance: number;
 };
 
+export type ReltrixClientSummary = {
+  crmId: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+};
+
+export type ReltrixLookupInput = {
+  crmId?: string | null;
+  email?: string | null;
+  phone?: string | null;
+};
+
 export type ReltrixForexSnapshot = {
   isLive: boolean;
+  hasClientMatch: boolean;
   checkedAt: string;
   message: string;
+  matchSource: "crm_id" | "email" | "phone" | null;
+  client: ReltrixClientSummary | null;
   totalClients: number;
   totalLeads: number;
   fundedWalletCount: number;
@@ -19,20 +35,15 @@ export type ReltrixForexSnapshot = {
   authMode: string;
 };
 
-type ReltrixClientSummary = {
-  crmId: string;
-  name: string;
-  email: string | null;
-};
-
 const RELTRIX_API_BASE_URL = "https://api.reltrixcrm.com";
-const RELTRIX_PAGE = 1;
-const RELTRIX_LIMIT = 100;
 
 const DEFAULT_SNAPSHOT: ReltrixForexSnapshot = {
   isLive: false,
+  hasClientMatch: false,
   checkedAt: new Date(0).toISOString(),
   message: "Reltrix live data is unavailable.",
+  matchSource: null,
+  client: null,
   totalClients: 0,
   totalLeads: 0,
   fundedWalletCount: 0,
@@ -67,58 +78,123 @@ function parseClient(item: unknown): ReltrixClientSummary | null {
   if (!crmId) return null;
 
   const firstName = parseString(item.first_name)?.trim() ?? "";
+  const middleName = parseString(item.middle_name)?.trim() ?? "";
   const lastName = parseString(item.last_name)?.trim() ?? "";
   const email = parseString(item.email)?.trim() || null;
-  const name = [firstName, lastName].filter(Boolean).join(" ") || email || `CRM #${crmId}`;
+  const phone = parseString(item.phone)?.trim() || null;
+  const name = [firstName, middleName, lastName].filter(Boolean).join(" ").replace(/\s+/g, " ") || email || `CRM #${crmId}`;
 
-  return { crmId, name, email };
+  return { crmId, name, email, phone };
 }
 
-async function fetchReltrixPage(pathname: string, page: number, itemsKey: string): Promise<{ totalPages: number; items: unknown[] }> {
+async function fetchReltrixJson(pathname: string, init: RequestInit = {}): Promise<unknown> {
   const apiKey = process.env.RELTRIX_API_KEY?.trim();
 
   if (!apiKey) {
     throw new Error("Missing RELTRIX_API_KEY");
   }
 
-  const response = await fetch(
-    `${RELTRIX_API_BASE_URL}${pathname}?page=${page}&limit=${RELTRIX_LIMIT}`,
-    {
-      headers: { "rx-api-key": apiKey },
-      next: { revalidate: 120 },
-      signal: AbortSignal.timeout(8_000),
+  const response = await fetch(`${RELTRIX_API_BASE_URL}${pathname}`, {
+    ...init,
+    headers: {
+      "rx-api-key": apiKey,
+      ...(init.body ? { "content-type": "application/json" } : {}),
+      ...init.headers,
     },
-  );
+    next: { revalidate: 120 },
+    signal: AbortSignal.timeout(8_000),
+  });
 
   if (!response.ok) {
+    if (response.status === 404) return null;
     throw new Error(`Reltrix ${pathname} returned HTTP ${response.status}`);
   }
 
-  const json = await response.json();
-  const root = isRecord(json) ? json : {};
-  const data = isRecord(root.data) ? root.data : {};
-  const totalPages = parseNumber(data.total_pages) ?? 0;
-  const items = Array.isArray(data[itemsKey]) ? data[itemsKey] : [];
-
-  return { totalPages, items };
+  return response.json();
 }
 
-async function fetchReltrixCollection(pathname: string, itemsKey: string): Promise<unknown[]> {
-  const firstPage = await fetchReltrixPage(pathname, RELTRIX_PAGE, itemsKey);
+function getDataRecord(json: unknown): Record<string, unknown> {
+  const root = isRecord(json) ? json : {};
+  return isRecord(root.data) ? root.data : {};
+}
 
-  if (firstPage.totalPages <= 1) {
-    return firstPage.items;
+async function fetchClientById(crmId: string): Promise<ReltrixClientSummary | null> {
+  const json = await fetchReltrixJson(`/api/v1/get_client_by_id.php?id=${encodeURIComponent(crmId)}`);
+  const client = getDataRecord(json).client;
+  return parseClient(client);
+}
+
+async function searchClients(payload: { email?: string; phone?: string }): Promise<ReltrixClientSummary[]> {
+  const json = await fetchReltrixJson("/api/v1/get_client_by_phone_or_email.php", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  const clients = getDataRecord(json).clients;
+
+  if (!Array.isArray(clients)) return [];
+
+  return clients.flatMap((item) => {
+    const client = parseClient(item);
+    return client ? [client] : [];
+  });
+}
+
+async function resolveClient(input: ReltrixLookupInput): Promise<{ client: ReltrixClientSummary | null; matchSource: ReltrixForexSnapshot["matchSource"]; message: string }> {
+  const crmId = input.crmId?.trim();
+  if (crmId) {
+    const client = await fetchClientById(crmId);
+    return {
+      client,
+      matchSource: client ? "crm_id" : null,
+      message: client ? "Reltrix client matched by saved CRM ID." : "No Reltrix client found for the saved CRM ID.",
+    };
   }
 
-  const remainingPages = Array.from({ length: firstPage.totalPages - 1 }, (_, index) => RELTRIX_PAGE + index + 1);
-  const remaining = await Promise.all(
-    remainingPages.map((page) => fetchReltrixPage(pathname, page, itemsKey)),
-  );
+  const email = input.email?.trim().toLowerCase();
+  if (email) {
+    const clients = await searchClients({ email });
+    const exact = clients.find((client) => client.email?.toLowerCase() === email) ?? (clients.length === 1 ? clients[0] : null);
 
-  return firstPage.items.concat(remaining.flatMap((page) => page.items));
+    if (exact) {
+      return { client: exact, matchSource: "email", message: "Reltrix client matched by Clerk email." };
+    }
+  }
+
+  const phone = input.phone?.trim();
+  if (phone) {
+    const clients = await searchClients({ phone });
+
+    if (clients.length === 1) {
+      return { client: clients[0], matchSource: "phone", message: "Reltrix client matched by Clerk phone." };
+    }
+
+    if (clients.length > 1) {
+      return { client: null, matchSource: null, message: "Reltrix phone lookup returned multiple clients. Email or saved CRM ID is required." };
+    }
+  }
+
+  return { client: null, matchSource: null, message: "No Reltrix client matched this Clerk user." };
 }
 
-export async function getReltrixForexSnapshot(): Promise<ReltrixForexSnapshot> {
+async function fetchWalletsByClientId(crmId: string, client: ReltrixClientSummary): Promise<ReltrixWalletSummary[]> {
+  const json = await fetchReltrixJson(`/api/v1/get_wallet_by_client_id.php?crm_id=${encodeURIComponent(crmId)}`);
+  const wallets = getDataRecord(json).wallets;
+
+  if (!Array.isArray(wallets)) return [];
+
+  return wallets.flatMap((item) => {
+    if (!isRecord(item)) return [];
+
+    const walletCrmId = parseString(item.crm_id);
+    const balance = parseNumber(item.balance);
+
+    if (!walletCrmId || balance === null) return [];
+
+    return [{ crmId: walletCrmId, clientName: client.name, email: client.email, balance }];
+  });
+}
+
+export async function getReltrixForexSnapshot(input: ReltrixLookupInput = {}): Promise<ReltrixForexSnapshot> {
   const checkedAt = new Date().toISOString();
 
   if (!process.env.RELTRIX_API_KEY?.trim()) {
@@ -130,44 +206,35 @@ export async function getReltrixForexSnapshot(): Promise<ReltrixForexSnapshot> {
   }
 
   try {
-    const [clients, leads, walletsRaw] = await Promise.all([
-      fetchReltrixCollection("/api/v1/get_clients.php", "clients"),
-      fetchReltrixCollection("/api/v1/get_leads.php", "leads"),
-      fetchReltrixCollection("/api/v1/get_wallets.php", "wallets"),
-    ]);
+    const resolved = await resolveClient(input);
+    const client = resolved.client ? await fetchClientById(resolved.client.crmId) ?? resolved.client : null;
 
-    const clientMap = new Map(
-      clients.flatMap((item) => {
-        const client = parseClient(item);
-        return client ? [[client.crmId, client] as const] : [];
-      }),
-    );
+    if (!client) {
+      return {
+        ...DEFAULT_SNAPSHOT,
+        isLive: true,
+        checkedAt,
+        message: resolved.message,
+      };
+    }
 
-    const wallets = walletsRaw.flatMap((item) => {
-      if (!isRecord(item)) return [];
-
-      const crmId = parseString(item.crm_id);
-      const balance = parseNumber(item.balance);
-
-      if (!crmId || balance === null) return [];
-
-      const client = clientMap.get(crmId) ?? null;
-
-      return [{ crmId, clientName: client?.name ?? null, email: client?.email ?? null, balance }];
-    });
+    const wallets = await fetchWalletsByClientId(client.crmId, client);
 
     wallets.sort((left, right) => right.balance - left.balance);
 
     return {
       isLive: true,
+      hasClientMatch: true,
       checkedAt,
-      message: "Live wallet, client, and lead data loaded from Reltrix.",
-      totalClients: clients.length,
-      totalLeads: leads.length,
+      message: resolved.message,
+      matchSource: resolved.matchSource,
+      client,
+      totalClients: 1,
+      totalLeads: 0,
       fundedWalletCount: wallets.length,
       totalWalletBalance: wallets.reduce((sum, wallet) => sum + wallet.balance, 0),
       topWallets: wallets.slice(0, 4),
-      authMode: "rx-api-key header · page=1",
+      authMode: "rx-api-key header · user lookup endpoints",
     };
   } catch (error) {
     return {
