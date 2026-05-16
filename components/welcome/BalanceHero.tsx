@@ -295,18 +295,18 @@ function ForexBalance({
           <div className="text-[10px] text-gray-500 uppercase tracking-widest font-body mb-2">Forex account balance</div>
           <span ref={balRef} className="block text-4xl md:text-5xl lg:text-6xl font-medium text-white tabular-nums tracking-tight">$0.00</span>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="text-[11px] text-gray-500">Client: <span className="text-white">{linkedSnapshot?.client?.name ?? "Connect account"}</span></span>
+            <span className="text-[11px] text-gray-500">Account holder: <span className="text-white">{linkedSnapshot?.client?.name ?? "Connect account"}</span></span>
             <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
-            <span className="text-[11px] text-gray-500">CRM ID: <span className="text-white">{linkedSnapshot?.client?.crmId ?? "—"}</span></span>
+            <span className="text-[11px] text-gray-500">Trading ID: <span className="text-white">{linkedSnapshot?.client?.crmId ?? "—"}</span></span>
             <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
             <span className="text-[11px] text-gray-500">
-              Wallets: <span className="text-white">{linkedSnapshot?.fundedWalletCount ?? 0}</span>
+              Trading wallets: <span className="text-white">{linkedSnapshot?.fundedWalletCount ?? 0}</span>
             </span>
             {reltrixForexSnapshot && (
               <>
                 <span className="text-[10px] text-gray-700 hidden sm:inline">·</span>
                 <span className="text-[11px] text-gray-500">
-                  Feed: <span className={linkedSnapshot ? "text-emerald-400" : "text-amber-300"}>{linkedSnapshot ? "linked" : "not linked"}</span>
+                  Status: <span className={linkedSnapshot ? "text-emerald-400" : "text-amber-300"}>{linkedSnapshot ? "Connected" : "Action needed"}</span>
                 </span>
               </>
             )}
@@ -321,44 +321,44 @@ function ForexBalance({
 
       <div className="hidden md:grid grid-cols-1 sm:grid-cols-4 border-t border-white/[0.08]">
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
-          <div className="flex items-center gap-1.5 mb-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /><span className="text-[10px] uppercase tracking-widest text-gray-500">Funded Accounts</span></div>
+          <div className="flex items-center gap-1.5 mb-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /><span className="text-[10px] uppercase tracking-widest text-gray-500">Trading Wallets</span></div>
           <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">{linkedSnapshot?.fundedWalletCount ?? 0}</div>
-          <div className="text-[10px] text-gray-500 mt-0.5">Wallets attached to this user</div>
+          <div className="text-[10px] text-gray-500 mt-0.5">Ready to fund and trade</div>
         </div>
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
-          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">CRM Profile</div>
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Trading Profile</div>
           <div className="truncate text-[18px] md:text-xl font-medium text-white">{linkedSnapshot?.client?.name ?? "Not connected"}</div>
-          <div className="text-[10px] text-gray-500 mt-0.5">{linkedSnapshot?.client ? `CRM #${linkedSnapshot.client.crmId}` : "Link this Clerk ID to a Reltrix CRM ID"}</div>
+          <div className="text-[10px] text-gray-500 mt-0.5">{linkedSnapshot?.client ? `Account #${linkedSnapshot.client.crmId}` : "Connect your trading account"}</div>
         </div>
         <div className="px-4 py-4 border-b sm:border-b-0 sm:border-r border-white/[0.08]">
-          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Wallets</div>
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">Balances</div>
           <div className="flex flex-col gap-1.5">
             {(linkedSnapshot?.topWallets ?? []).slice(0, 3).map((wallet) => (
               <div key={wallet.crmId} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                 <div className="min-w-0">
-                  <div className="truncate text-[11px] font-medium text-white">{wallet.clientName ?? `CRM #${wallet.crmId}`}</div>
+                  <div className="truncate text-[11px] font-medium text-white">{wallet.clientName ?? `Account #${wallet.crmId}`}</div>
                   <div className="truncate text-[9px] text-gray-600">Wallet balance</div>
                 </div>
                 <span className="text-[11px] text-emerald-400 tabular-nums">{formatUSD(wallet.balance)}</span>
               </div>
             ))}
             {(!linkedSnapshot || linkedSnapshot.topWallets.length === 0) && (
-              <div className="text-[10px] text-gray-500">No wallet balance returned yet.</div>
+              <div className="text-[10px] text-gray-500">No funded trading wallet yet.</div>
             )}
           </div>
         </div>
         <div className="px-4 py-4">
           <div className="flex items-center gap-1.5 mb-1.5">
             <span className={`h-1.5 w-1.5 rounded-full ${linkedSnapshot ? "bg-emerald-400" : "bg-amber-300"}`} />
-            <span className="text-[10px] uppercase tracking-widest text-gray-500">Account Link</span>
+            <span className="text-[10px] uppercase tracking-widest text-gray-500">Connection</span>
           </div>
           <div className="text-[18px] md:text-xl font-medium text-white tabular-nums">
-            {linkedSnapshot?.matchSource ? linkedSnapshot.matchSource.replace("_", " ") : "Needs link"}
+            {linkedSnapshot ? "Connected" : "Action needed"}
           </div>
           <div className="text-[10px] text-gray-500 mt-0.5">
             {linkedSnapshot
-              ? "Matched from saved Clerk identity"
-              : "Save the user’s Reltrix CRM ID against their Clerk ID"}
+              ? "Your trading profile is connected"
+              : "Connect your trading profile to view balances"}
           </div>
           {reltrixForexSnapshot && (
             <div className="mt-2 text-[9px] uppercase tracking-widest text-gray-600 tabular-nums">

@@ -12,12 +12,23 @@ export default async function WelcomePage() {
 
   const firstName = user?.firstName ?? "Trader";
   const lastName = user?.lastName ?? "";
+  const reltrixLookupEmail =
+    user?.primaryEmailAddress?.emailAddress ??
+    user?.emailAddresses?.[0]?.emailAddress ??
+    null;
+  const reltrixLookupPhone =
+    user?.primaryPhoneNumber?.phoneNumber ??
+    user?.phoneNumbers?.[0]?.phoneNumber ??
+    null;
   const reltrixLink = await getPersistedReltrixCrmId({
     authUserId: user?.id,
     privateMetadata: user?.privateMetadata,
   });
   const reltrixForexSnapshot = await getReltrixForexSnapshot({
     crmId: reltrixLink?.crmId,
+    email: reltrixLookupEmail,
+    phone: reltrixLookupPhone,
+    allowContactLookup: true,
   });
 
   return (
@@ -32,4 +43,3 @@ export default async function WelcomePage() {
     />
   );
 }
-
